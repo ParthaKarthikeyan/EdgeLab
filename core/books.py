@@ -15,15 +15,16 @@ BOOKS = {
     "crypto_trend": {
         "label": "Crypto 6h trend",
         "active": True,
-        "rules_version": 1,
+        # v2: SOL admitted after the sweep — passes Gate A with these exact
+        # frozen params on all 15 neighboring variants (ledger/research/).
+        "rules_version": 2,
         "fn": run_trend,
         "params": dict(entry_lookback=20, exit_lookback=10, atr_period=14,
                        atr_stop_mult=3.0, trend_fast=50, trend_slow=200,
                        risk_pct=0.01, allow_short=False),
-        # BTC only: ETH failed Gate A at 2x costs (2/5 walk-forward folds) —
-        # verdict in ledger/research/. Admission is per symbol; ETH can reapply
-        # if a future re-run changes the verdict.
-        "symbols": {"BTC/USD": "BTC-USD"},   # alpaca -> coinbase
+        # Admission is per symbol at these frozen params: BTC and SOL pass,
+        # ETH failed at 2x costs (2/5 walk-forward folds) and can reapply.
+        "symbols": {"BTC/USD": "BTC-USD", "SOL/USD": "SOL-USD"},
         "interval": "6h",
         "history_years": 4.0,
         "cost_bps": 20.0,            # modeled 1x cost; Gate A judges at 2x

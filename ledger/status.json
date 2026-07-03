@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-03 08:21",
+  "generated": "2026-07-03 08:45",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -8,7 +8,7 @@
       "active": true,
       "interval": "6h",
       "dd_budget_pct": 20.0,
-      "rules_version": 1,
+      "rules_version": 2,
       "deployment_date": "2026-07-03",
       "sessions": 1,
       "pnl": 0.0,
@@ -17,7 +17,7 @@
       "stage": "paper",
       "gate_a": {
         "passed": true,
-        "generated": "2026-07-03 08:12",
+        "generated": "2026-07-03 08:45",
         "checks": [
           {
             "name": "all_symbols_pass",
