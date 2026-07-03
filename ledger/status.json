@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-03 16:42",
+  "generated": "2026-07-03 17:50",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -31,9 +31,9 @@
         "passed": false,
         "checks": [
           {
-            "name": "sessions",
+            "name": "evidence",
             "passed": false,
-            "detail": "1/30 forward sessions"
+            "detail": "1 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -82,9 +82,9 @@
         "passed": false,
         "checks": [
           {
-            "name": "sessions",
+            "name": "evidence",
             "passed": false,
-            "detail": "1/30 forward sessions"
+            "detail": "1 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
           },
           {
             "name": "positive_on_fills",

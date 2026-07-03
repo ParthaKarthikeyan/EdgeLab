@@ -15,7 +15,13 @@ from dataclasses import dataclass, field
 # --- thresholds (the methodology, in numbers) --------------------------------
 WF_FOLDS = 5                 # sequential out-of-sample folds
 COST_STRESS = 2.0            # Gate A judged at 2x modeled costs
+# Gate B needs EVIDENCE, and evidence is trades as much as calendar:
+# either the full 30 sessions, or 14+ sessions with 40+ closed trades.
+# A book trading daily shouldn't wait a month to be judged; a book trading
+# twice a month can't be judged in two weeks no matter what the clock says.
 GATE_B_SESSIONS = 30
+GATE_B_FAST_SESSIONS = 14
+GATE_B_FAST_TRADES = 40
 GATE_C_SESSIONS = 60
 RECON_GAP_MAX = 0.10         # reconciliation gap < 10% of gross P&L
 ROLLING_WINDOW = 21          # sessions in the "monthly" average
@@ -81,8 +87,14 @@ def gate_b(ledger: dict, trades: list, dd_budget_pct: float) -> GateResult:
     rows = _sessions(ledger)
     bank = ledger.get("bankroll", 10000.0)
     n = len(rows)
+    n_trades = len(trades)
     pnl = sum(row["pnl"] for row in rows)
-    r.add("sessions", n >= GATE_B_SESSIONS, f"{n}/{GATE_B_SESSIONS} forward sessions")
+    enough = n >= GATE_B_SESSIONS or (
+        n >= GATE_B_FAST_SESSIONS and n_trades >= GATE_B_FAST_TRADES)
+    r.add("evidence", enough,
+          f"{n} sessions, {n_trades} closed trades (need {GATE_B_SESSIONS} "
+          f"sessions, or {GATE_B_FAST_SESSIONS}+ with "
+          f"{GATE_B_FAST_TRADES}+ trades)")
     r.add("positive_on_fills", pnl > 0, f"total P&L {pnl:+,.2f} (filled prices)")
     dd = _max_dd_pct(rows, bank)
     r.add("drawdown_in_budget", dd <= dd_budget_pct,

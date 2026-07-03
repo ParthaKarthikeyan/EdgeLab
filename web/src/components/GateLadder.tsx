@@ -101,7 +101,7 @@ export default function GateLadder({ books }: { books: Record<string, BookStatus
     <Card>
       <CardHeader
         title="Gate ladder"
-        sub="A: edge survives 2x costs out-of-sample · B: 30 forward sessions on real fills · C: rolling average holds over 60"
+        sub="A: edge survives 2x costs out-of-sample · B: forward evidence on real fills (30 sessions, or 14+ with 40+ trades) · C: rolling average holds over 60"
       />
       <div className="mt-2">
         {order.map(([name, book]) => (

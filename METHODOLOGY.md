@@ -32,7 +32,7 @@ Every strategy is a plug-in that must climb:
 | Gate | What it proves | Pass criteria (coded, not vibes) |
 |---|---|---|
 | **A — Research** | Edge survives costs out-of-sample | Profitable (ret > 0 AND PF > 1) in >50% of 5 sequential walk-forward folds **at 2x modeled costs**, and net-positive over the full period at 2x costs. A candidate that only works at 1x is fragile. |
-| **B — Paper** | Edge survives reality | ≥ **30 forward sessions** on a $10k paper book: total P&L > 0 **on actual broker fills**, max drawdown inside the book's stated budget, reconciliation gap < 10% of gross P&L. |
+| **B — Paper** | Edge survives reality | Enough forward evidence on a $10k paper book — **30 sessions, or 14+ sessions with 40+ closed trades** (evidence is trades as much as calendar; a book trading daily shouldn't wait a month, a book trading twice a month can't be judged in two weeks): total P&L > 0 **on actual broker fills**, max drawdown inside the book's stated budget, reconciliation gap < 10% of gross P&L. |
 | **C — Scale** | The average is what it claims | ≥ 60 sessions and the rolling-21 $/day average positive with the drawdown still in budget. Only now is real capital even discussed. |
 
 Backtests choose candidates. Only the forward ledger promotes them.

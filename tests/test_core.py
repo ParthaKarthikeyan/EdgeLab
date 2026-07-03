@@ -96,6 +96,15 @@ def test_gate_b_needs_sessions_and_profit():
     ok = gate_b(_ledger(GATE_B_SESSIONS, 10), [], 20)
     assert ok.passed
 
+def test_gate_b_fast_path_via_trades():
+    trades = [{"pnl": 5.0, "slippage": 0.1}] * 45
+    fast = gate_b(_ledger(14, 10), trades, 20)
+    assert fast.passed, "14 sessions + 45 trades should clear gate B"
+    few_trades = gate_b(_ledger(14, 10), trades[:10], 20)
+    assert not few_trades.passed, "14 sessions with 10 trades is not evidence"
+    too_short = gate_b(_ledger(10, 10), trades, 20)
+    assert not too_short.passed, "trade count cannot excuse < 14 sessions"
+
 def test_gate_b_reconciliation_gap():
     trades = [{"pnl": 100.0, "slippage": 20.0}] * 5   # 20% gap
     r = gate_b(_ledger(GATE_B_SESSIONS, 10), trades, 20)
