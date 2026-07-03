@@ -35,9 +35,19 @@ export async function fetchLive(book: string): Promise<LiveState | null> {
     gistId = cfg?.gist_id || null
   }
   if (!gistId) return null
-  return getJSON<LiveState>(
+  const doc = await getJSON<LiveState>(
     `https://gist.githubusercontent.com/${OWNER}/${gistId}/raw/${book}_live.json?${bust()}`,
   )
+  // The gist can hold placeholder content before the bot's first push;
+  // only accept a payload that is actually a live state.
+  if (!doc || typeof doc.equity !== 'number' || typeof doc.updated_at !== 'string')
+    return null
+  return {
+    ...doc,
+    positions: Array.isArray(doc.positions) ? doc.positions : [],
+    last_prices: doc.last_prices ?? {},
+    notes: doc.notes ?? [],
+  }
 }
 
 export async function fetchRuns(): Promise<WorkflowRun[]> {
