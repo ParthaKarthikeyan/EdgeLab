@@ -18,9 +18,13 @@ Per METHODOLOGY.md:
 
 import argparse
 import os
+import sys
 import time
 import uuid
 from datetime import datetime, timezone
+
+if hasattr(sys.stdout, "reconfigure"):        # Windows consoles default cp1252
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 import numpy as np
 import pandas as pd
@@ -30,6 +34,7 @@ from core.books import BANKROLL, DAILY_STOP_PCT, active_books
 from core.data import completed_bars, get_candles
 from core.engine import atr, ema
 from core.gist import GistPublisher
+from core.oanda import OandaBroker, get_fx_candles
 
 MIN_NOTIONAL = 10.0          # Alpaca minimum crypto order ~$10
 
@@ -51,6 +56,7 @@ def prep_fade(df: pd.DataFrame, p: dict) -> pd.DataFrame:
     d["std"] = d["close"].rolling(p["sma_period"]).std()
     d["ema"] = ema(d["close"], p["trend_ema"])
     d["lower"] = d["sma"] - p["band_k"] * d["std"]
+    d["upper"] = d["sma"] + p["band_k"] * d["std"]
     return d
 
 
@@ -88,7 +94,9 @@ def fade_entry(d, p) -> dict | None:
     if np.isnan(r["std"]) or r["std"] <= 0 or np.isnan(r["ema"]):
         return None
     if r["close"] < r["lower"] and r["close"] > r["ema"]:
-        return {"dist": p["stop_k"] * float(r["std"])}
+        return {"dist": p["stop_k"] * float(r["std"]), "side": 1}
+    if p.get("allow_short") and r["close"] > r["upper"] and r["close"] < r["ema"]:
+        return {"dist": p["stop_k"] * float(r["std"]), "side": -1}
     return None
 
 
@@ -96,10 +104,13 @@ def fade_exit(d, p, pos) -> str | None:
     r = d.iloc[-1]
     if np.isnan(r["std"]) or r["std"] <= 0:
         return None
+    s = pos.get("side", 1)
     entry_t = pd.Timestamp(pos["entry_time"])
-    if float(r["low"]) <= pos["entry"] - p["stop_k"] * float(r["std"]):
+    stop = pos["entry"] - s * p["stop_k"] * float(r["std"])
+    if (s == 1 and float(r["low"]) <= stop) or (s == -1 and float(r["high"]) >= stop):
         return "stop"
-    if float(r["high"]) >= float(r["sma"]):
+    if (s == 1 and float(r["high"]) >= float(r["sma"])) or \
+       (s == -1 and float(r["low"]) <= float(r["sma"])):
         return "mean"
     if len(d[d.index > entry_t]) >= p["max_hold"]:
         return "time"
@@ -142,23 +153,38 @@ class Broker:
 
 # --- one book, one run ---------------------------------------------------------
 def run_book(name: str, spec: dict, broker, gist, now) -> list:
+    """Venue differences handled here:
+    crypto — spot cash accounting (cash moves on fills), long-only, float qty;
+    fx     — margin accounting (cash fixed, positions carry pnl), signed int
+             units, shorts allowed. Both share the same ledger/gist plumbing."""
+    venue = spec.get("venue", "crypto")
     today = now.strftime("%Y-%m-%d")
     led = L.open_ledger(name, BANKROLL, spec["rules_version"], today)
     tlog = L.load(name, "trades") or {"book": name, "history": []}
 
     prep, entry_fn, exit_fn = RULES[spec["fn"].__name__]
     frames, last_px, notes = {}, {}, []
-    for alp, product in spec["symbols"].items():
+    for disp, product in spec["symbols"].items():
         try:
-            df = completed_bars(prep(get_candles(
-                product, interval=spec["interval"],
-                years=spec["history_years"]), spec["params"]), spec["interval"])
-            frames[alp] = df
-            last_px[alp] = float(df["close"].iloc[-1])
+            if venue == "fx":
+                raw, _spread = get_fx_candles(product, spec["interval"],
+                                              spec["history_years"])
+                df = prep(raw, spec["params"])       # OANDA returns complete bars
+            else:
+                df = completed_bars(prep(get_candles(
+                    product, interval=spec["interval"],
+                    years=spec["history_years"]), spec["params"]),
+                    spec["interval"])
+            frames[disp] = df
+            last_px[disp] = float(df["close"].iloc[-1])
         except Exception as e:                       # noqa: BLE001
-            notes.append(f"{alp}: no data ({e})")
+            notes.append(f"{disp}: no data ({e})")
 
     def equity():
+        if venue == "fx":
+            return led["cash"] + sum(
+                p["units"] * (last_px.get(s, p["entry"]) - p["entry"])
+                for s, p in led["positions"].items())
         return led["cash"] + sum(p["units"] * last_px.get(s, p["entry"])
                                  for s, p in led["positions"].items())
 
@@ -167,50 +193,79 @@ def run_book(name: str, spec: dict, broker, gist, now) -> list:
     stopped = equity() <= led["day_anchor"]["equity"] * (1 - DAILY_STOP_PCT)
 
     session_trades, actions = [], []
-    for alp, d in frames.items():
-        pos = led["positions"].get(alp)
-        px = last_px[alp]
+    for disp, d in frames.items():
+        pos = led["positions"].get(disp)
+        px = last_px[disp]
+        instrument = spec["symbols"][disp]
         if pos is not None:
             reason = exit_fn(d, spec["params"], pos)
             if reason:
                 units, fill_px = pos["units"], px
-                if broker is not None and units > 0:
-                    fq, fp = broker.market(name, alp, units, "sell")
-                    if fq > 0:
-                        units, fill_px = fq, fp
-                led["cash"] += units * fill_px
-                led["positions"].pop(alp, None)
+                if broker is not None:
+                    if venue == "fx":
+                        fq, fp = broker.market(name, instrument, -int(units))
+                    else:
+                        fq, fp = broker.market(name, instrument, units, "sell")
+                    if fq != 0:
+                        fill_px = fp
+                if venue == "fx":
+                    led["cash"] += units * (fill_px - pos["entry"])
+                    side = "long" if units > 0 else "short"
+                    tr_units = abs(units)
+                else:
+                    led["cash"] += units * fill_px
+                    side, tr_units = "long", units
+                led["positions"].pop(disp, None)
                 tr = L.make_trade(
-                    date=today, symbol=alp, side="long", units=units,
+                    date=today, symbol=disp, side=side, units=tr_units,
                     entry_time=pos["entry_time"],
                     exit_time=now.strftime("%Y-%m-%d %H:%M"),
                     intended_entry=pos.get("intended_entry", pos["entry"]),
                     intended_exit=px, entry_price=pos["entry"],
                     exit_price=fill_px, reason=reason)
                 session_trades.append(tr)
-                actions.append(f"{alp}: EXIT {reason} @ {fill_px:,.2f} "
+                actions.append(f"{disp}: EXIT {reason} @ {fill_px:,.4f} "
                                f"pnl {tr['pnl']:+,.2f} slip {tr['slippage']:+,.2f}")
         else:
             sig = entry_fn(d, spec["params"])
             if sig and stopped:
-                actions.append(f"{alp}: entry signal SKIPPED — -2% daily stop active")
+                actions.append(f"{disp}: entry signal SKIPPED — -2% daily stop active")
             elif sig:
                 eq = equity()
-                units = min(eq * spec["params"]["risk_pct"] / sig["dist"],
-                            led["cash"] / px)
-                if units * px >= MIN_NOTIONAL:
-                    fill_px = px
+                side = sig.get("side", 1)
+                units = eq * spec["params"]["risk_pct"] / sig["dist"]
+                max_lev = spec["params"].get("max_leverage", 1.0)
+                units = min(units, eq * max_lev / px)
+                if venue == "crypto":
+                    units = min(units, led["cash"] / px)
+                if units * px < MIN_NOTIONAL:
+                    continue
+                fill_px = px
+                if venue == "fx":
+                    units = side * int(units)
+                    if units == 0:
+                        continue
                     if broker is not None:
-                        fq, fp = broker.market(name, alp, units, "buy")
+                        fq, fp = broker.market(name, instrument, units)
+                        if fq == 0:
+                            actions.append(f"{disp}: entry not filled "
+                                           "(market closed?)")
+                            continue
+                        units, fill_px = fq, fp
+                else:
+                    if broker is not None:
+                        fq, fp = broker.market(name, instrument, units, "buy")
                         if fq <= 0:
                             continue
                         units, fill_px = fq, fp
                     led["cash"] -= units * fill_px
-                    led["positions"][alp] = {
-                        "units": round(units, 8), "entry": round(fill_px, 4),
-                        "intended_entry": round(px, 4),
-                        "entry_time": str(d.index[-1])}
-                    actions.append(f"{alp}: ENTER long {units:.6f} @ {fill_px:,.2f}")
+                led["positions"][disp] = {
+                    "units": round(units, 8), "entry": round(fill_px, 5),
+                    "intended_entry": round(px, 5), "side": side,
+                    "entry_time": str(d.index[-1])}
+                word = "long" if side == 1 else "short"
+                actions.append(f"{disp}: ENTER {word} {abs(units):,.6g} "
+                               f"@ {fill_px:,.4f}")
 
     # daily row (upsert) + persistence only on material change
     eq = round(equity(), 2)
@@ -260,24 +315,30 @@ def main():
     args = ap.parse_args()
 
     now = datetime.now(timezone.utc)
-    if not args.dry_run and not (os.getenv("ALPACA_API_KEY") and
-                                 os.getenv("ALPACA_SECRET_KEY")):
-        # Missing keys must not poison the ledger with pretend fills, and an
-        # hourly wall of red runs helps nobody: skip loudly, exit green.
-        msg = ("## EdgeLab paper runner — SKIPPED\n"
-               "`ALPACA_API_KEY` / `ALPACA_SECRET_KEY` are not configured; "
-               "no orders, no ledger writes.")
-        print(msg)
-        sp = os.environ.get("GITHUB_STEP_SUMMARY")
-        if sp:
-            with open(sp, "a", encoding="utf-8") as f:
-                f.write(msg + "\n")
-        return
-    broker = None if args.dry_run else Broker()
     gist = GistPublisher()
+
+    # one broker per venue, created lazily; a venue with missing keys skips
+    # loudly instead of poisoning the ledger with pretend fills
+    KEYS = {"crypto": ("ALPACA_API_KEY", "ALPACA_SECRET_KEY"),
+            "fx": ("OANDA_API_KEY", "OANDA_ACCOUNT_ID")}
+    MAKERS = {"crypto": Broker, "fx": OandaBroker}
+    brokers: dict = {}
 
     md = [f"# EdgeLab paper runner — {now:%Y-%m-%d %H:%M} UTC", ""]
     for name, spec in active_books().items():
+        venue = spec.get("venue", "crypto")
+        if args.dry_run:
+            broker = None
+        else:
+            if venue not in brokers:
+                missing = [k for k in KEYS[venue] if not os.getenv(k)]
+                brokers[venue] = None if missing else MAKERS[venue]()
+            broker = brokers[venue]
+            if broker is None:
+                md += [f"## {spec['label']} — SKIPPED",
+                       f"missing secrets: {', '.join(k for k in KEYS[venue] if not os.getenv(k))}",
+                       ""]
+                continue
         md += run_book(name, spec, broker, gist, now) + [""]
 
     report = "\n".join(md)

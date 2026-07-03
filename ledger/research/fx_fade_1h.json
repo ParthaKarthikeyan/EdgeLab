@@ -1,0 +1,105 @@
+{
+  "book": "fx_fade_1h",
+  "label": "FX 1h fade (AUD/USD)",
+  "interval": "H1",
+  "params": {
+    "sma_period": 20,
+    "band_k": 2.5,
+    "stop_k": 4.0,
+    "trend_ema": 200,
+    "max_hold": 12,
+    "risk_pct": 0.01,
+    "allow_short": true,
+    "max_leverage": 5.0
+  },
+  "cost_bps_base": 2.7,
+  "cost_bps_stressed": 5.4,
+  "generated": "2026-07-03 15:04",
+  "passed": true,
+  "note": "Gate A requires every traded symbol to pass at stressed costs.",
+  "symbols": {
+    "AUD/USD": {
+      "bars": 18642,
+      "trades_per_year": 38.7,
+      "base": {
+        "end": 11189.37,
+        "ret": 11.89,
+        "trades": 116,
+        "win_rate": 68.1,
+        "profit_factor": 1.48,
+        "max_dd": 3.25
+      },
+      "stressed": {
+        "end": 10430.53,
+        "ret": 4.31,
+        "trades": 116,
+        "win_rate": 67.24,
+        "profit_factor": 1.16,
+        "max_dd": 3.58
+      },
+      "folds_stressed": [
+        {
+          "end": 9915.02,
+          "ret": -0.85,
+          "trades": 24,
+          "win_rate": 62.5,
+          "profit_factor": 0.88,
+          "max_dd": 3.58
+        },
+        {
+          "end": 10113.76,
+          "ret": 1.14,
+          "trades": 26,
+          "win_rate": 65.38,
+          "profit_factor": 1.21,
+          "max_dd": 2.33
+        },
+        {
+          "end": 10205.95,
+          "ret": 2.06,
+          "trades": 25,
+          "win_rate": 76.0,
+          "profit_factor": 1.49,
+          "max_dd": 1.52
+        },
+        {
+          "end": 10204.85,
+          "ret": 2.05,
+          "trades": 11,
+          "win_rate": 81.82,
+          "profit_factor": 2.27,
+          "max_dd": 1.2
+        },
+        {
+          "end": 10070.36,
+          "ret": 0.7,
+          "trades": 27,
+          "win_rate": 62.96,
+          "profit_factor": 1.11,
+          "max_dd": 2.46
+        }
+      ],
+      "gate_a": {
+        "gate": "A",
+        "passed": true,
+        "checks": [
+          {
+            "name": "walk_forward_majority",
+            "passed": true,
+            "detail": "4/5 folds profitable at 2x costs"
+          },
+          {
+            "name": "net_positive_stressed",
+            "passed": true,
+            "detail": "full period at 2x costs: ret +4.3%, PF 1.16"
+          },
+          {
+            "name": "enough_trades",
+            "passed": true,
+            "detail": "116 trades in the backtest (need >= 30 for the stats to mean anything)"
+          }
+        ]
+      }
+    }
+  }
+}

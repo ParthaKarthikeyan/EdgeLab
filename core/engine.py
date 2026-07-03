@@ -54,7 +54,7 @@ def run_trend(df: pd.DataFrame, *, start_cash: float = 10000.0,
               entry_lookback: int = 20, exit_lookback: int = 10,
               atr_period: int = 14, atr_stop_mult: float = 3.0,
               trend_fast: int = 50, trend_slow: int = 200,
-              allow_short: bool = False) -> dict:
+              allow_short: bool = False, max_leverage: float = 1.0) -> dict:
     if len(df) < trend_slow + entry_lookback + 5:
         return {"trades": [], "curve": [start_cash], "end": start_cash}
     d = df.copy()
@@ -111,7 +111,7 @@ def run_trend(df: pd.DataFrame, *, start_cash: float = 10000.0,
             if side:
                 entry = r["close"]
                 dist = atr_stop_mult * r["atr"]
-                units = _size(equity, risk_pct, dist, entry)
+                units = _size(equity, risk_pct, dist, entry, max_leverage)
                 if units > 0:
                     pos = {"side": side, "entry": entry, "stop": entry - side * dist,
                            "peak": entry, "units": units, "entry_time": ts}
@@ -124,7 +124,7 @@ def run_fade(df: pd.DataFrame, *, start_cash: float = 10000.0,
              cost_bps: float = 20.0, risk_pct: float = 0.01,
              sma_period: int = 20, band_k: float = 2.0, stop_k: float = 3.5,
              trend_ema: int = 200, max_hold: int = 24,
-             allow_short: bool = False) -> dict:
+             allow_short: bool = False, max_leverage: float = 1.0) -> dict:
     """Fade Bollinger extremes back to the mean, only WITH the long-EMA trend
     (long fades in an uptrend; short fades need allow_short)."""
     if len(df) < max(sma_period, trend_ema) + 5:
@@ -175,7 +175,7 @@ def run_fade(df: pd.DataFrame, *, start_cash: float = 10000.0,
             if side:
                 entry = r["close"]
                 dist = stop_k * r["std"]
-                units = _size(equity, risk_pct, dist, entry)
+                units = _size(equity, risk_pct, dist, entry, max_leverage)
                 if units > 0:
                     pos = {"side": side, "entry": entry, "stop": entry - side * dist,
                            "units": units, "bars": 0, "entry_time": ts}

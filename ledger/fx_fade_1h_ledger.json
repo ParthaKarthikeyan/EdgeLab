@@ -1,0 +1,25 @@
+{
+  "book": "fx_fade_1h",
+  "rules_version": 1,
+  "deployment_date": "2026-07-03",
+  "bankroll": 10000.0,
+  "cash": 10000.0,
+  "positions": {},
+  "day_anchor": {
+    "date": "2026-07-03",
+    "equity": 10000.0
+  },
+  "history": [
+    {
+      "date": "2026-07-03",
+      "book_start": 10000.0,
+      "book_end": 10000.0,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "trades": 0,
+      "open_positions": 0,
+      "stopped": null
+    }
+  ],
+  "last_run": "2026-07-03 15:05"
+}

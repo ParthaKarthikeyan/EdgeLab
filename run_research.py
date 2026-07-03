@@ -14,7 +14,11 @@ decision — can cite it.
 import argparse
 import json
 import os
+import sys
 from datetime import datetime, timezone
+
+if hasattr(sys.stdout, "reconfigure"):        # Windows consoles default cp1252
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from core.books import BOOKS, BANKROLL
 from core.data import get_candles
@@ -30,8 +34,13 @@ def research_book(name: str, spec: dict) -> dict:
     # instead Gate A must hold for EVERY symbol the book trades.
     verdicts = []
     for alp, product in spec["symbols"].items():
-        df = get_candles(product, interval=spec["interval"],
-                         years=spec["history_years"])
+        if spec.get("venue") == "fx":
+            from core.oanda import get_fx_candles
+            # research judges the full history at the measured spread cost
+            df, _ = get_fx_candles(product, spec["interval"], 3.0)
+        else:
+            df = get_candles(product, interval=spec["interval"],
+                             years=spec["history_years"])
         base = metrics(spec["fn"](df, start_cash=BANKROLL,
                                   cost_bps=spec["cost_bps"], **spec["params"]),
                        BANKROLL)
