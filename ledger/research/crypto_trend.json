@@ -1,0 +1,105 @@
+{
+  "book": "crypto_trend",
+  "label": "Crypto 6h trend",
+  "interval": "6h",
+  "params": {
+    "entry_lookback": 20,
+    "exit_lookback": 10,
+    "atr_period": 14,
+    "atr_stop_mult": 3.0,
+    "trend_fast": 50,
+    "trend_slow": 200,
+    "risk_pct": 0.01,
+    "allow_short": false
+  },
+  "cost_bps_base": 20.0,
+  "cost_bps_stressed": 40.0,
+  "generated": "2026-07-03 08:12",
+  "passed": true,
+  "note": "Gate A requires every traded symbol to pass at stressed costs.",
+  "symbols": {
+    "BTC/USD": {
+      "bars": 5840,
+      "trades_per_year": 15.0,
+      "base": {
+        "end": 11015.78,
+        "ret": 10.16,
+        "trades": 60,
+        "win_rate": 41.67,
+        "profit_factor": 1.57,
+        "max_dd": 3.91
+      },
+      "stressed": {
+        "end": 10742.77,
+        "ret": 7.43,
+        "trades": 60,
+        "win_rate": 40.0,
+        "profit_factor": 1.39,
+        "max_dd": 4.28
+      },
+      "folds_stressed": [
+        {
+          "end": 10091.11,
+          "ret": 0.91,
+          "trades": 11,
+          "win_rate": 54.55,
+          "profit_factor": 1.33,
+          "max_dd": 2.21
+        },
+        {
+          "end": 10114.31,
+          "ret": 1.14,
+          "trades": 14,
+          "win_rate": 42.86,
+          "profit_factor": 1.23,
+          "max_dd": 1.97
+        },
+        {
+          "end": 10307.1,
+          "ret": 3.07,
+          "trades": 16,
+          "win_rate": 37.5,
+          "profit_factor": 1.67,
+          "max_dd": 4.28
+        },
+        {
+          "end": 9842.86,
+          "ret": -1.57,
+          "trades": 14,
+          "win_rate": 21.43,
+          "profit_factor": 0.67,
+          "max_dd": 4.01
+        },
+        {
+          "end": 9830.11,
+          "ret": -1.7,
+          "trades": 4,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "max_dd": 1.7
+        }
+      ],
+      "gate_a": {
+        "gate": "A",
+        "passed": true,
+        "checks": [
+          {
+            "name": "walk_forward_majority",
+            "passed": true,
+            "detail": "3/5 folds profitable at 2x costs"
+          },
+          {
+            "name": "net_positive_stressed",
+            "passed": true,
+            "detail": "full period at 2x costs: ret +7.4%, PF 1.39"
+          },
+          {
+            "name": "enough_trades",
+            "passed": true,
+            "detail": "60 trades in the backtest (need >= 30 for the stats to mean anything)"
+          }
+        ]
+      }
+    }
+  }
+}

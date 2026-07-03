@@ -1,0 +1,136 @@
+{
+  "generated": "2026-07-03 08:13",
+  "bankroll": 10000.0,
+  "rolling_window": 21,
+  "books": {
+    "crypto_trend": {
+      "label": "Crypto 6h trend",
+      "active": true,
+      "interval": "6h",
+      "dd_budget_pct": 20.0,
+      "rules_version": 1,
+      "deployment_date": "2026-07-03",
+      "sessions": 1,
+      "pnl": 0.0,
+      "rolling_avg": 0.0,
+      "rolling_window_filled": 1,
+      "stage": "paper",
+      "gate_a": {
+        "passed": true,
+        "generated": "2026-07-03 08:12",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": true,
+            "detail": "Gate A requires every traded symbol to pass at stressed costs."
+          }
+        ]
+      },
+      "gate_b": {
+        "gate": "B",
+        "passed": false,
+        "checks": [
+          {
+            "name": "sessions",
+            "passed": false,
+            "detail": "1/30 forward sessions"
+          },
+          {
+            "name": "positive_on_fills",
+            "passed": false,
+            "detail": "total P&L +0.00 (filled prices)"
+          },
+          {
+            "name": "drawdown_in_budget",
+            "passed": true,
+            "detail": "max DD 0.0% vs budget 20%"
+          },
+          {
+            "name": "reconciliation",
+            "passed": true,
+            "detail": "slippage $0.00 vs gross $0.00 (0.0%, cap 10%)"
+          }
+        ]
+      },
+      "gate_c": null
+    },
+    "crypto_trend_1h": {
+      "label": "Crypto 1h trend (candidate)",
+      "active": false,
+      "interval": "1h",
+      "dd_budget_pct": 15.0,
+      "rules_version": 1,
+      "deployment_date": null,
+      "sessions": 0,
+      "pnl": 0,
+      "rolling_avg": null,
+      "rolling_window_filled": 0,
+      "stage": "gate_a",
+      "gate_a": {
+        "passed": false,
+        "generated": "2026-07-03 08:13",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": false,
+            "detail": "Gate A requires every traded symbol to pass at stressed costs."
+          }
+        ]
+      },
+      "gate_b": null,
+      "gate_c": null
+    },
+    "crypto_fade_1h": {
+      "label": "Crypto 1h fade (candidate)",
+      "active": false,
+      "interval": "1h",
+      "dd_budget_pct": 15.0,
+      "rules_version": 1,
+      "deployment_date": null,
+      "sessions": 0,
+      "pnl": 0,
+      "rolling_avg": null,
+      "rolling_window_filled": 0,
+      "stage": "gate_a",
+      "gate_a": {
+        "passed": false,
+        "generated": "2026-07-03 08:07",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": false,
+            "detail": "Gate A requires every traded symbol to pass at stressed costs."
+          }
+        ]
+      },
+      "gate_b": null,
+      "gate_c": null
+    },
+    "crypto_fade_15m": {
+      "label": "Crypto 15m fade (candidate)",
+      "active": false,
+      "interval": "15m",
+      "dd_budget_pct": 15.0,
+      "rules_version": 1,
+      "deployment_date": null,
+      "sessions": 0,
+      "pnl": 0,
+      "rolling_avg": null,
+      "rolling_window_filled": 0,
+      "stage": "gate_a",
+      "gate_a": {
+        "passed": false,
+        "generated": "2026-07-03 08:09",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": false,
+            "detail": "Gate A requires every traded symbol to pass at stressed costs."
+          }
+        ]
+      },
+      "gate_b": null,
+      "gate_c": null
+    }
+  }
+}
