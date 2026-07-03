@@ -260,6 +260,19 @@ def main():
     args = ap.parse_args()
 
     now = datetime.now(timezone.utc)
+    if not args.dry_run and not (os.getenv("ALPACA_API_KEY") and
+                                 os.getenv("ALPACA_SECRET_KEY")):
+        # Missing keys must not poison the ledger with pretend fills, and an
+        # hourly wall of red runs helps nobody: skip loudly, exit green.
+        msg = ("## EdgeLab paper runner — SKIPPED\n"
+               "`ALPACA_API_KEY` / `ALPACA_SECRET_KEY` are not configured; "
+               "no orders, no ledger writes.")
+        print(msg)
+        sp = os.environ.get("GITHUB_STEP_SUMMARY")
+        if sp:
+            with open(sp, "a", encoding="utf-8") as f:
+                f.write(msg + "\n")
+        return
     broker = None if args.dry_run else Broker()
     gist = GistPublisher()
 
