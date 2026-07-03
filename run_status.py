@@ -51,6 +51,15 @@ def main():
     doc = {"generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
            "bankroll": BANKROLL, "rolling_window": ROLLING_WINDOW,
            "books": books}
+    # skip the write when nothing but the timestamp changed — otherwise every
+    # hourly run produces a pointless ledger commit
+    if os.path.exists(OUT):
+        with open(OUT, encoding="utf-8") as f:
+            old = json.load(f)
+        if {k: v for k, v in old.items() if k != "generated"} == \
+           {k: v for k, v in doc.items() if k != "generated"}:
+            print(f"{OUT} unchanged")
+            return
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(doc, f, indent=2)
