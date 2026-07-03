@@ -46,8 +46,11 @@ jobs:
             echo "no ledger changes"
           else
             git commit -m "paper: ledger update $(date -u +'%Y-%m-%d %H:%M')"
-            git pull --rebase origin master || true
-            git push
+            for i in 1 2 3; do
+              git pull --rebase origin master && git push && break
+              echo "push attempt $i failed; retrying"
+              sleep $((i * 5))
+            done
           fi
 
 
