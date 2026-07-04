@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from itertools import product
 
 from core.books import BANKROLL
-from core.engine import metrics, run_fade, run_trend, walk_forward
+from core.engine import metrics, run_channel, run_fade, run_trend, walk_forward
 from core.gates import COST_STRESS, WF_FOLDS, gate_a, profitable
 from core.oanda import get_fx_candles
 
@@ -40,7 +40,12 @@ FADE_GRID = [dict(sma_period=sp, band_k=bk, stop_k=bk + 1.5, trend_ema=200,
                   max_hold=mh, risk_pct=0.01, allow_short=True,
                   max_leverage=MAX_LEV)
              for sp, bk, mh in product([14, 20, 30], [2.0, 2.5], [12, 24])]
-FAMILIES = {"trend": (run_trend, TREND_GRID), "fade": (run_fade, FADE_GRID)}
+CHANNEL_GRID = [dict(ema_period=20, atr_period=10, channel_mult=cm,
+                     adx_min=am, atr_stop_mult=3.0, risk_pct=0.01,
+                     allow_short=True, max_leverage=MAX_LEV)
+                for cm, am in product([1.5, 2.0, 2.5], [0.0, 20.0, 25.0])]
+FAMILIES = {"trend": (run_trend, TREND_GRID), "fade": (run_fade, FADE_GRID),
+            "channel": (run_channel, CHANNEL_GRID)}
 
 
 def eval_cell(df, fn, params, cost_bps):

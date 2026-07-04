@@ -27,6 +27,23 @@ def atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
     return tr.ewm(span=period, adjust=False).mean()
 
 
+def adx(df: pd.DataFrame, period: int = 14) -> pd.Series:
+    """Wilder's ADX — trend-strength gate (direction-agnostic)."""
+    up = df["high"].diff()
+    dn = -df["low"].diff()
+    plus_dm = up.where((up > dn) & (up > 0), 0.0)
+    minus_dm = dn.where((dn > up) & (dn > 0), 0.0)
+    prev = df["close"].shift(1)
+    tr = pd.concat([df["high"] - df["low"], (df["high"] - prev).abs(),
+                    (df["low"] - prev).abs()], axis=1).max(axis=1)
+    alpha = 1.0 / period
+    atr_w = tr.ewm(alpha=alpha, adjust=False).mean()
+    plus_di = 100 * plus_dm.ewm(alpha=alpha, adjust=False).mean() / atr_w
+    minus_di = 100 * minus_dm.ewm(alpha=alpha, adjust=False).mean() / atr_w
+    dx = 100 * (plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan)
+    return dx.ewm(alpha=alpha, adjust=False).mean()
+
+
 def metrics(res: dict, start_cash: float) -> dict:
     trades, curve = res["trades"], res["curve"]
     wins = [t for t in trades if t["pnl"] > 0]
@@ -120,13 +137,88 @@ def run_trend(df: pd.DataFrame, *, start_cash: float = 10000.0,
     return {"trades": trades, "curve": curve, "end": equity}
 
 
+def run_channel(df: pd.DataFrame, *, start_cash: float = 10000.0,
+                cost_bps: float = 20.0, risk_pct: float = 0.01,
+                ema_period: int = 20, atr_period: int = 10,
+                channel_mult: float = 2.0, adx_min: float = 0.0,
+                adx_period: int = 14, atr_stop_mult: float = 3.0,
+                allow_short: bool = False, max_leverage: float = 1.0) -> dict:
+    """Keltner-channel breakout, optionally gated by ADX trend strength —
+    the survivor combo from mass-backtest studies (Keltner + ADX). Enter on a
+    close beyond the channel when ADX confirms; exit on ATR chandelier or a
+    close back through the mid-line."""
+    need = max(ema_period, atr_period, adx_period) + 5
+    if len(df) < need:
+        return {"trades": [], "curve": [start_cash], "end": start_cash}
+    d = df.copy()
+    d["mid"] = ema(d["close"], ema_period)
+    d["katr"] = atr(d, atr_period)
+    d["upper"] = d["mid"] + channel_mult * d["katr"]
+    d["lower"] = d["mid"] - channel_mult * d["katr"]
+    d["adx"] = adx(d, adx_period)
+    d["satr"] = atr(d, 14)
+    side_frac = cost_bps / 2.0 / 10000.0
+
+    equity, pos = start_cash, None
+    trades, curve = [], [equity]
+
+    def close(px, reason, ts):
+        nonlocal equity, pos
+        gross = pos["side"] * pos["units"] * (px - pos["entry"])
+        cost = side_frac * pos["units"] * (pos["entry"] + px)
+        pnl = gross - cost
+        trades.append({"side": pos["side"], "entry_time": pos["entry_time"],
+                       "exit_time": ts, "entry": pos["entry"], "exit": px,
+                       "units": pos["units"], "pnl": pnl, "reason": reason})
+        equity += pnl
+        curve.append(equity)
+        pos = None
+
+    for ts, r in d.iterrows():
+        if np.isnan(r["upper"]) or np.isnan(r["satr"]) or np.isnan(r["adx"]):
+            continue
+        if pos is not None:
+            s = pos["side"]
+            if s == 1:
+                pos["peak"] = max(pos["peak"], r["high"])
+                pos["stop"] = max(pos["stop"], pos["peak"] - atr_stop_mult * r["satr"])
+            else:
+                pos["peak"] = min(pos["peak"], r["low"])
+                pos["stop"] = min(pos["stop"], pos["peak"] + atr_stop_mult * r["satr"])
+            stop_hit = (s == 1 and r["low"] <= pos["stop"]) or \
+                       (s == -1 and r["high"] >= pos["stop"])
+            mid_cross = (s == 1 and r["close"] < r["mid"]) or \
+                        (s == -1 and r["close"] > r["mid"])
+            if stop_hit:
+                close(pos["stop"], "stop", ts)
+            elif mid_cross:
+                close(r["close"], "mid_cross", ts)
+        if pos is None:
+            gate = r["adx"] >= adx_min
+            long_sig = gate and r["close"] > r["upper"]
+            short_sig = gate and allow_short and r["close"] < r["lower"]
+            side = 1 if long_sig else (-1 if short_sig else 0)
+            if side:
+                entry = r["close"]
+                dist = atr_stop_mult * r["satr"]
+                units = _size(equity, risk_pct, dist, entry, max_leverage)
+                if units > 0:
+                    pos = {"side": side, "entry": entry, "stop": entry - side * dist,
+                           "peak": entry, "units": units, "entry_time": ts}
+    if pos is not None:
+        close(float(d["close"].iloc[-1]), "eod", d.index[-1])
+    return {"trades": trades, "curve": curve, "end": equity}
+
+
 def run_fade(df: pd.DataFrame, *, start_cash: float = 10000.0,
              cost_bps: float = 20.0, risk_pct: float = 0.01,
              sma_period: int = 20, band_k: float = 2.0, stop_k: float = 3.5,
-             trend_ema: int = 200, max_hold: int = 24,
+             trend_ema: int = 200, max_hold: int = 24, vol_mult: float = 0.0,
              allow_short: bool = False, max_leverage: float = 1.0) -> dict:
     """Fade Bollinger extremes back to the mean, only WITH the long-EMA trend
-    (long fades in an uptrend; short fades need allow_short)."""
+    (long fades in an uptrend; short fades need allow_short). vol_mult > 0
+    additionally requires the entry bar's volume >= vol_mult x its 20-bar
+    average — the capitulation-confirmation filter (Bollinger + volume)."""
     if len(df) < max(sma_period, trend_ema) + 5:
         return {"trades": [], "curve": [start_cash], "end": start_cash}
     d = df.copy()
@@ -135,6 +227,7 @@ def run_fade(df: pd.DataFrame, *, start_cash: float = 10000.0,
     d["ema"] = ema(d["close"], trend_ema)
     d["upper"] = d["sma"] + band_k * d["std"]
     d["lower"] = d["sma"] - band_k * d["std"]
+    d["vol_avg"] = d["volume"].rolling(20).mean()
     side_frac = cost_bps / 2.0 / 10000.0
 
     equity, pos = start_cash, None
@@ -169,8 +262,12 @@ def run_fade(df: pd.DataFrame, *, start_cash: float = 10000.0,
             elif pos["bars"] >= max_hold:
                 close(r["close"], "time", ts)
         if pos is None:
-            long_sig = r["close"] < r["lower"] and r["close"] > r["ema"]
-            short_sig = allow_short and r["close"] > r["upper"] and r["close"] < r["ema"]
+            vol_ok = (vol_mult <= 0 or
+                      (not np.isnan(r["vol_avg"]) and r["vol_avg"] > 0
+                       and r["volume"] >= vol_mult * r["vol_avg"]))
+            long_sig = vol_ok and r["close"] < r["lower"] and r["close"] > r["ema"]
+            short_sig = (vol_ok and allow_short and r["close"] > r["upper"]
+                         and r["close"] < r["ema"])
             side = 1 if long_sig else (-1 if short_sig else 0)
             if side:
                 entry = r["close"]

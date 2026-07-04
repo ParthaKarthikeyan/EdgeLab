@@ -24,7 +24,7 @@ from itertools import product
 
 from core.books import BANKROLL
 from core.data import get_candles
-from core.engine import metrics, run_fade, run_trend, walk_forward
+from core.engine import metrics, run_channel, run_fade, run_trend, walk_forward
 from core.gates import COST_STRESS, WF_FOLDS, gate_a, profitable
 
 COST_BPS = 20.0
@@ -56,7 +56,19 @@ TREND_GRID = [dict(entry_lookback=el, exit_lookback=el // 2, atr_period=14,
 FADE_GRID = [dict(sma_period=sp, band_k=bk, stop_k=bk + 1.5, trend_ema=200,
                   max_hold=mh, risk_pct=0.01, allow_short=False)
              for sp, bk, mh in product([14, 20, 30], [2.0, 2.5], [12, 24])]
-FAMILIES = {"trend": (run_trend, TREND_GRID), "fade": (run_fade, FADE_GRID)}
+# families flagged by mass-backtest survivor stats: Keltner(+ADX) breakouts
+# and Bollinger-with-volume-confirmation fades
+CHANNEL_GRID = [dict(ema_period=20, atr_period=10, channel_mult=cm,
+                     adx_min=am, atr_stop_mult=3.0, risk_pct=0.01,
+                     allow_short=False)
+                for cm, am in product([1.5, 2.0, 2.5], [0.0, 20.0, 25.0])]
+FADE_VOL_GRID = [dict(sma_period=sp, band_k=bk, stop_k=bk + 1.5, trend_ema=200,
+                      max_hold=mh, vol_mult=1.5, risk_pct=0.01,
+                      allow_short=False)
+                 for sp, bk, mh in product([14, 20, 30], [2.0, 2.5], [12, 24])]
+FAMILIES = {"trend": (run_trend, TREND_GRID), "fade": (run_fade, FADE_GRID),
+            "channel": (run_channel, CHANNEL_GRID),
+            "fade_vol": (run_fade, FADE_VOL_GRID)}
 
 
 def eval_cell(df, fn, params):

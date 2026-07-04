@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from core import ledger as L
-from core.engine import metrics, run_fade, run_trend, walk_forward
+from core.engine import metrics, run_channel, run_fade, run_trend, walk_forward
 from core.gates import GATE_B_SESSIONS, gate_a, gate_b, gate_c, book_status
 
 
@@ -56,6 +56,25 @@ def test_fade_trades_dips_in_uptrend():
 def test_no_short_on_spot():
     res = run_fade(make_df(choppy(), freq="1h"), cost_bps=20, allow_short=False)
     assert all(t["side"] == 1 for t in res["trades"])
+
+def test_channel_profits_in_trend():
+    res = run_channel(make_df(trending_up()), cost_bps=20)
+    assert res["trades"], "channel engine never traded a clean uptrend"
+    assert res["end"] > 10000
+
+def test_adx_gate_reduces_trades():
+    df = make_df(choppy(800))
+    open_gate = run_channel(df, cost_bps=20, adx_min=0.0)
+    tight = run_channel(df, cost_bps=20, adx_min=25.0)
+    assert len(tight["trades"]) <= len(open_gate["trades"])
+
+def test_volume_filter_reduces_fade_trades():
+    closes = trending_up(800, drift=0.15)
+    closes[300:305] -= 8
+    df = make_df(closes, freq="1h")
+    base = run_fade(df, cost_bps=20)
+    filtered = run_fade(df, cost_bps=20, vol_mult=1.5)
+    assert len(filtered["trades"]) <= len(base["trades"])
 
 def test_walk_forward_shapes():
     folds = walk_forward(make_df(trending_up(1000)), run_trend, {}, 40, n_folds=5)
