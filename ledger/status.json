@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-04 21:10",
+  "generated": "2026-07-04 21:45",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -111,12 +111,12 @@
       "interval": "1d",
       "dd_budget_pct": 25.0,
       "rules_version": 1,
-      "deployment_date": null,
-      "sessions": 0,
-      "pnl": 0,
-      "rolling_avg": null,
-      "rolling_window_filled": 0,
-      "stage": "awaiting_paper",
+      "deployment_date": "2026-07-04",
+      "sessions": 1,
+      "pnl": 0.0,
+      "rolling_avg": 0.0,
+      "rolling_window_filled": 1,
+      "stage": "paper",
       "gate_a": {
         "passed": true,
         "generated": "2026-07-04 21:09",
@@ -128,7 +128,32 @@
           }
         ]
       },
-      "gate_b": null,
+      "gate_b": {
+        "gate": "B",
+        "passed": false,
+        "checks": [
+          {
+            "name": "evidence",
+            "passed": false,
+            "detail": "1 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
+          },
+          {
+            "name": "positive_on_fills",
+            "passed": false,
+            "detail": "total P&L +0.00 (filled prices)"
+          },
+          {
+            "name": "drawdown_in_budget",
+            "passed": true,
+            "detail": "max DD 0.0% vs budget 25%"
+          },
+          {
+            "name": "reconciliation",
+            "passed": true,
+            "detail": "slippage $0.00 vs gross $0.00 (0.0%, cap 10%)"
+          }
+        ]
+      },
       "gate_c": null
     },
     "crypto_trend_1h": {
