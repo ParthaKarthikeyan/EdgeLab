@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-04 21:45",
+  "generated": "2026-07-04 23:11",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -33,7 +33,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "1 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
+            "detail": "1 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -84,7 +84,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "2 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
+            "detail": "2 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -135,7 +135,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "1 sessions, 0 closed trades (need 30 sessions, or 14+ with 40+ trades)"
+            "detail": "1 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
