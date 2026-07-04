@@ -28,8 +28,25 @@ from core.engine import metrics, run_fade, run_trend, walk_forward
 from core.gates import COST_STRESS, WF_FOLDS, gate_a, profitable
 
 COST_BPS = 20.0
-SYMBOLS = {"BTC-USD": "BTC/USD", "ETH-USD": "ETH/USD", "SOL-USD": "SOL/USD"}
-INTERVALS = {"1h": 3.0, "6h": 4.0}          # interval -> years of history
+# symbol -> (display, intervals). Universe = liquid pairs listed on BOTH
+# Coinbase (data) and Alpaca (execution). Alts are swept at 6h only: the
+# majors sweep showed 1h fails across the board at stressed costs, and alt
+# spreads are wider still — testing alts at 1h would be theater.
+SYMBOLS_PLAN = {
+    "BTC-USD": ("BTC/USD", ["1h", "6h"]),
+    "ETH-USD": ("ETH/USD", ["1h", "6h"]),
+    "SOL-USD": ("SOL/USD", ["1h", "6h"]),
+    "XRP-USD": ("XRP/USD", ["6h"]),
+    "DOGE-USD": ("DOGE/USD", ["6h"]),
+    "LTC-USD": ("LTC/USD", ["6h"]),
+    "LINK-USD": ("LINK/USD", ["6h"]),
+    "AVAX-USD": ("AVAX/USD", ["6h"]),
+    "DOT-USD": ("DOT/USD", ["6h"]),
+    "BCH-USD": ("BCH/USD", ["6h"]),
+    "UNI-USD": ("UNI/USD", ["6h"]),
+}
+SYMBOLS = {p: d for p, (d, _) in SYMBOLS_PLAN.items()}
+INTERVAL_YEARS = {"1h": 3.0, "6h": 4.0}     # interval -> years of history
 
 # Parameter families. Neighbors within a family = same knobs, adjacent values.
 TREND_GRID = [dict(entry_lookback=el, exit_lookback=el // 2, atr_period=14,
@@ -62,12 +79,14 @@ def eval_cell(df, fn, params):
 
 def main():
     data = {}
-    for product_id, (interval, years) in product(SYMBOLS, INTERVALS.items()):
-        print(f"[data] {product_id} {interval} ({years:g}y)...")
-        try:
-            data[(product_id, interval)] = get_candles(product_id, interval, years)
-        except Exception as e:                    # noqa: BLE001
-            print(f"[data] {product_id} {interval} failed: {e}")
+    for product_id, (_disp, intervals) in SYMBOLS_PLAN.items():
+        for interval in intervals:
+            years = INTERVAL_YEARS[interval]
+            print(f"[data] {product_id} {interval} ({years:g}y)...")
+            try:
+                data[(product_id, interval)] = get_candles(product_id, interval, years)
+            except Exception as e:                # noqa: BLE001
+                print(f"[data] {product_id} {interval} failed: {e}")
 
     cells = []
     for fam, (fn, grid) in FAMILIES.items():
