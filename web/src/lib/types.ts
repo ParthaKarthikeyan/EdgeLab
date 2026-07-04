@@ -109,7 +109,10 @@ export interface Research {
   cost_bps_stressed: number
   generated: string
   passed: boolean
-  symbols: Record<string, ResearchSymbol>
+  /** Per-symbol books have this; panel books (e.g. equity momentum) don't. */
+  symbols?: Record<string, ResearchSymbol>
+  /** Panel books summarize their verdict here instead. */
+  note?: string
 }
 
 export interface WorkflowRun {

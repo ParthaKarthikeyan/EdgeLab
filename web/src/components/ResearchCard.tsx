@@ -27,6 +27,10 @@ export default function ResearchCard({ docs }: { docs: Research[] }) {
                 stress {doc.cost_bps_stressed}bps rt · {doc.generated}
               </span>
             </div>
+            {!doc.symbols && doc.note && (
+              <div className="mt-3 text-xs text-ink-400">{doc.note}</div>
+            )}
+            {doc.symbols && (
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -72,6 +76,7 @@ export default function ResearchCard({ docs }: { docs: Research[] }) {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         ))}
       </div>
