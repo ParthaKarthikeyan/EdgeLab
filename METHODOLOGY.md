@@ -33,8 +33,13 @@ Every strategy is a plug-in that must climb:
 | Gate | What it proves | Pass criteria (coded, not vibes) |
 |---|---|---|
 | **A — Research** | Edge survives costs out-of-sample | Profitable (ret > 0 AND PF > 1) in >50% of 5 sequential walk-forward folds **at 2x modeled costs**, and net-positive over the full period at 2x costs. A candidate that only works at 1x is fragile. |
-| **B — Paper** | Edge survives reality | Enough forward evidence on a $10k paper book — **30 sessions, or 14+ sessions with 40+ closed trades** (evidence is trades as much as calendar; a book trading daily shouldn't wait a month, a book trading twice a month can't be judged in two weeks): total P&L > 0 **on actual broker fills**, max drawdown inside the book's stated budget, reconciliation gap < 10% of gross P&L. |
-| **C — Scale** | The average is what it claims | ≥ 60 sessions and the rolling-21 $/day average positive with the drawdown still in budget. Only now is real capital even discussed. |
+| **B — Paper** | Edge survives reality | Enough forward evidence on a $10k paper book — **10 sessions, or 7+ sessions with 20+ closed trades**: total P&L > 0 **on actual broker fills**, max drawdown inside the book's stated budget, reconciliation gap < 10% of gross P&L. |
+| **C — Scale** | The average is what it claims | ≥ 21 sessions (a full rolling window) with the rolling-21 $/day average positive and the drawdown still in budget. After go-live this gate is judged on the LIVE ledger and controls whether size grows. |
+
+*(Gate B amended 2026-07-04 from 30/14/40 sessions/trades: hard deadline — validation
+completes over the 10 trading sessions 2026-07-06 → 2026-07-17, live trading starts
+2026-07-20. Ten sessions is thin evidence; the compensating control is that go-live
+size is small and Gate C, now measured on live results, gates every increase.)*
 
 Backtests choose candidates. Only the forward ledger promotes them.
 
@@ -56,6 +61,17 @@ Backtests choose candidates. Only the forward ledger promotes them.
 ## Relationship to DayTrade
 
 The sibling repo (DayTrade) keeps running its books unchanged — daily-governed
-premarket, capped experiments. After ~6 weeks the two projects form a natural A/B:
-gate-driven uncapped books vs daily-target-governed books, on the same dashboard
-axes. Losing that comparison honestly is also a result.
+premarket, capped experiments. Both projects now share the same clock: paper
+validation over the 10 sessions ending 2026-07-17, go-live decision that weekend.
+The two form a natural A/B — gate-driven uncapped books vs daily-target-governed
+books, on the same dashboard axes. Losing that comparison honestly is also a result.
+
+## Go-live plan (2026-07-20)
+
+- Only books that **pass Gate B on 2026-07-17** go live; the rest stay paper.
+- Live size starts at a fraction of the eventual $10k (small enough that a full
+  drawdown-budget hit is an acceptable tuition bill), with the same -2% daily
+  loss stop and per-book kill criteria: breach of the drawdown budget or a
+  reconciliation gap ≥ 10% halts the book back to paper.
+- Scaling live size requires Gate C on the live ledger — 21+ live sessions with
+  the rolling-21 $/day average positive.

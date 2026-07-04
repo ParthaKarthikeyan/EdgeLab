@@ -9,7 +9,8 @@ import pytest
 
 from core import ledger as L
 from core.engine import metrics, run_channel, run_fade, run_trend, walk_forward
-from core.gates import GATE_B_SESSIONS, gate_a, gate_b, gate_c, book_status
+from core.gates import (GATE_B_FAST_SESSIONS, GATE_B_FAST_TRADES,
+                        GATE_B_SESSIONS, gate_a, gate_b, gate_c, book_status)
 
 
 # --- fixtures -----------------------------------------------------------------
@@ -125,7 +126,7 @@ def _ledger(n_days, daily_pnl, bankroll=10000.0):
             "history": rows}
 
 def test_gate_b_needs_sessions_and_profit():
-    short = gate_b(_ledger(5, 10), [], 20)
+    short = gate_b(_ledger(GATE_B_SESSIONS - 5, 10), [], 20)
     assert not short.passed
     losing = gate_b(_ledger(GATE_B_SESSIONS, -5), [], 20)
     assert not losing.passed
@@ -133,13 +134,14 @@ def test_gate_b_needs_sessions_and_profit():
     assert ok.passed
 
 def test_gate_b_fast_path_via_trades():
-    trades = [{"pnl": 5.0, "slippage": 0.1}] * 45
-    fast = gate_b(_ledger(14, 10), trades, 20)
-    assert fast.passed, "14 sessions + 45 trades should clear gate B"
-    few_trades = gate_b(_ledger(14, 10), trades[:10], 20)
-    assert not few_trades.passed, "14 sessions with 10 trades is not evidence"
-    too_short = gate_b(_ledger(10, 10), trades, 20)
-    assert not too_short.passed, "trade count cannot excuse < 14 sessions"
+    trades = [{"pnl": 5.0, "slippage": 0.1}] * (GATE_B_FAST_TRADES + 5)
+    fast = gate_b(_ledger(GATE_B_FAST_SESSIONS, 10), trades, 20)
+    assert fast.passed, "enough sessions + enough trades should clear gate B"
+    few_trades = gate_b(_ledger(GATE_B_FAST_SESSIONS, 10),
+                        trades[:GATE_B_FAST_TRADES // 2], 20)
+    assert not few_trades.passed, "too few trades is not evidence"
+    too_short = gate_b(_ledger(GATE_B_FAST_SESSIONS - 2, 10), trades, 20)
+    assert not too_short.passed, "trade count cannot excuse too few sessions"
 
 def test_gate_b_reconciliation_gap():
     trades = [{"pnl": 100.0, "slippage": 20.0}] * 5   # 20% gap

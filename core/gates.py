@@ -1,8 +1,8 @@
 """The acceptance gates as code. METHODOLOGY.md is the contract; this enforces it.
 
 Gate A (research): does the edge survive costs out-of-sample?
-Gate B (paper):    does it survive reality (real fills, 30+ sessions)?
-Gate C (scale):    is the monthly average what it claims (60+ sessions)?
+Gate B (paper):    does it survive reality (real fills, 10-session window)?
+Gate C (scale):    is the monthly average what it claims (rolling-21 positive)?
 
 Each check returns a GateResult with per-criterion detail so the dashboard can
 show WHY a book is where it is, not just a pass/fail flag.
@@ -16,13 +16,17 @@ from dataclasses import dataclass, field
 WF_FOLDS = 5                 # sequential out-of-sample folds
 COST_STRESS = 2.0            # Gate A judged at 2x modeled costs
 # Gate B needs EVIDENCE, and evidence is trades as much as calendar:
-# either the full 30 sessions, or 14+ sessions with 40+ closed trades.
-# A book trading daily shouldn't wait a month to be judged; a book trading
-# twice a month can't be judged in two weeks no matter what the clock says.
-GATE_B_SESSIONS = 30
-GATE_B_FAST_SESSIONS = 14
-GATE_B_FAST_TRADES = 40
-GATE_C_SESSIONS = 60
+# either the full 10 sessions, or 7+ sessions with 20+ closed trades.
+# (Amended 2026-07-04 from 30/14/40: hard go-live deadline of 2026-07-20.
+# 10 sessions is thin evidence and everyone involved knows it — the risk is
+# priced in by going live SMALL and letting Gate C, now judged on the live
+# ledger, decide whether size ever grows.)
+GATE_B_SESSIONS = 10
+GATE_B_FAST_SESSIONS = 7
+GATE_B_FAST_TRADES = 20
+# Gate C is the SCALE gate: after go-live it runs on the live ledger — at
+# least a full rolling window of sessions with the $/day average positive.
+GATE_C_SESSIONS = 21
 RECON_GAP_MAX = 0.10         # reconciliation gap < 10% of gross P&L
 ROLLING_WINDOW = 21          # sessions in the "monthly" average
 
