@@ -91,6 +91,10 @@ def main():
     lines = ["# EdgeLab research — Gate A verdicts", ""]
     for name in names:
         spec = BOOKS[name]
+        if spec.get("venue") == "equity":
+            print(f"[research] {name}: panel book — researched by "
+                  "run_momentum_research.py, skipping here")
+            continue
         print(f"[research] {name} ({spec['label']})")
         doc = research_book(name, spec)
         out = os.path.join(OUT_DIR, f"{spec['gate_a_file']}.json")

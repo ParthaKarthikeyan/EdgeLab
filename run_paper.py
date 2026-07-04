@@ -33,10 +33,12 @@ from core import ledger as L
 from core.books import BANKROLL, DAILY_STOP_PCT, active_books
 from core.data import completed_bars, get_candles
 from core.engine import atr, ema
+from core.equities import get_close_panel, momentum_targets
 from core.gist import GistPublisher
 from core.oanda import OandaBroker, get_fx_candles
 
 MIN_NOTIONAL = 10.0          # Alpaca minimum crypto order ~$10
+MIN_EQ_DELTA = 50.0          # skip equity rebalance legs smaller than this
 
 
 # --- frozen-rule evaluation on the last completed bar ------------------------
@@ -149,6 +151,176 @@ class Broker:
                 break
         print(f"[order] {alp_symbol} {side} not filled cleanly (status {o.status})")
         return float(o.filled_qty or 0), float(o.filled_avg_price or 0)
+
+    def market_open(self) -> bool:
+        return bool(self.trading.get_clock().is_open)
+
+    def market_stock(self, book: str, symbol: str, qty: float, side: str):
+        """Fractional stock market order (DAY tif required for fractional)."""
+        from alpaca.trading.requests import MarketOrderRequest
+        from alpaca.trading.enums import OrderSide, TimeInForce
+        oid = f"el-{book}-{uuid.uuid4().hex[:10]}"
+        o = self.trading.submit_order(MarketOrderRequest(
+            symbol=symbol, qty=round(qty, 4),
+            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+            time_in_force=TimeInForce.DAY, client_order_id=oid))
+        for _ in range(20):
+            time.sleep(1)
+            o = self.trading.get_order_by_id(o.id)
+            status = str(o.status).split(".")[-1].lower()
+            if status == "filled":
+                return float(o.filled_qty), float(o.filled_avg_price)
+            if status in {"canceled", "cancelled", "expired", "rejected"}:
+                break
+        print(f"[order] {symbol} {side} not filled cleanly (status {o.status})")
+        return float(o.filled_qty or 0), float(o.filled_avg_price or 0)
+
+
+# --- the equity panel book (rebalance-to-weights, weekly) ----------------------
+def run_equity_book(name: str, spec: dict, broker, gist, now) -> list:
+    """Cash accounting like crypto, but the unit of decision is the whole
+    panel: on Mondays during market hours, rebalance to the momentum target
+    weights; every other run just marks to market. The -2% daily stop blocks
+    the BUY legs of a rebalance, never the sells."""
+    p = spec["params"]
+    today = now.strftime("%Y-%m-%d")
+    led = L.open_ledger(name, BANKROLL, spec["rules_version"], today)
+    tlog = L.load(name, "trades") or {"book": name, "history": []}
+
+    panel = get_close_panel(spec["universe"] + [spec["regime_symbol"]],
+                            spec["history_years"])
+    notes = []
+    if spec["regime_symbol"] not in panel.columns or \
+            panel.shape[1] - 1 < 0.9 * len(spec["universe"]):
+        return [f"## {spec['label']} — SKIPPED",
+                f"panel incomplete ({panel.shape[1]}/{len(spec['universe']) + 1} "
+                "columns); not trading a mangled universe"]
+    spy = panel.pop(spec["regime_symbol"])
+    last_px = {s: float(panel[s].dropna().iloc[-1]) for s in panel.columns
+               if panel[s].notna().any()}
+
+    def equity():
+        return led["cash"] + sum(pos["units"] * last_px.get(s, pos["entry"])
+                                 for s, pos in led["positions"].items())
+
+    if led.get("day_anchor", {}).get("date") != today:
+        led["day_anchor"] = {"date": today, "equity": round(equity(), 2)}
+    stopped = equity() <= led["day_anchor"]["equity"] * (1 - DAILY_STOP_PCT)
+
+    session_trades, actions = [], []
+    rebalanced = False
+    is_rebal_day = now.weekday() == 0 or not led.get("last_rebalance")
+    already = led.get("last_rebalance") == today
+    market_open = True if broker is None else broker.market_open()
+
+    if is_rebal_day and not already and market_open:
+        targets = momentum_targets(panel, spy, lookback=p["lookback"],
+                                   top_k=p["top_k"])
+        eq = equity()
+        legs = []
+        for s in set(led["positions"]) | set(targets):
+            px = last_px.get(s)
+            if px is None:
+                continue
+            cur = led["positions"].get(s, {}).get("units", 0.0)
+            delta = eq * targets.get(s, 0.0) / px - cur
+            if abs(delta * px) >= MIN_EQ_DELTA:
+                legs.append((s, delta, px))
+        legs.sort(key=lambda leg: leg[1])          # sells first, frees cash
+        for s, delta, px in legs:
+            side = "sell" if delta < 0 else "buy"
+            if side == "buy" and stopped:
+                actions.append(f"{s}: buy leg SKIPPED — -2% daily stop active")
+                continue
+            qty, fill_px = abs(delta), px
+            if broker is not None:
+                fq, fp = broker.market_stock(name, s, qty, side)
+                if fq <= 0:
+                    actions.append(f"{s}: {side} not filled")
+                    continue
+                qty, fill_px = fq, fp
+            pos = led["positions"].get(s)
+            if side == "buy":
+                if qty * fill_px > led["cash"]:
+                    qty = max(led["cash"], 0.0) / fill_px
+                    if qty * fill_px < MIN_EQ_DELTA:
+                        continue
+                led["cash"] -= qty * fill_px
+                if pos:                              # add: weighted avg entry
+                    tot = pos["units"] + qty
+                    pos["entry"] = round((pos["units"] * pos["entry"]
+                                          + qty * fill_px) / tot, 4)
+                    pos["units"] = round(tot, 4)
+                else:
+                    led["positions"][s] = {
+                        "units": round(qty, 4), "entry": round(fill_px, 4),
+                        "intended_entry": round(px, 4), "side": 1,
+                        "entry_time": today}
+                actions.append(f"{s}: BUY {qty:,.4g} @ {fill_px:,.2f}")
+            else:
+                qty = min(qty, pos["units"]) if pos else 0.0
+                if qty <= 0:
+                    continue
+                led["cash"] += qty * fill_px
+                pos["units"] = round(pos["units"] - qty, 4)
+                if pos["units"] * fill_px < 1.0:     # position closed: log it
+                    tr = L.make_trade(
+                        date=today, symbol=s, side="long",
+                        units=qty + pos["units"],
+                        entry_time=pos["entry_time"],
+                        exit_time=now.strftime("%Y-%m-%d %H:%M"),
+                        intended_entry=pos.get("intended_entry", pos["entry"]),
+                        intended_exit=px, entry_price=pos["entry"],
+                        exit_price=fill_px, reason="rotate")
+                    session_trades.append(tr)
+                    led["positions"].pop(s, None)
+                    actions.append(f"{s}: EXIT rotate @ {fill_px:,.2f} "
+                                   f"pnl {tr['pnl']:+,.2f}")
+                else:
+                    actions.append(f"{s}: TRIM {qty:,.4g} @ {fill_px:,.2f}")
+        led["last_rebalance"] = today
+        rebalanced = True
+        if not legs:
+            actions.append("rebalance checked — already at target weights")
+    elif is_rebal_day and not already:
+        actions.append("rebalance day, but market closed — waiting")
+
+    eq = round(equity(), 2)
+    day_start = led["day_anchor"]["equity"]
+    row = {"date": today, "book_start": round(day_start, 2), "book_end": eq,
+           "pnl": round(eq - day_start, 2),
+           "pnl_pct": round((eq / day_start - 1) * 100, 2) if day_start else 0.0,
+           "trades": len([t for t in tlog["history"] if t["date"] == today])
+                     + len(session_trades),
+           "open_positions": len(led["positions"]),
+           "stopped": "loss_stop" if stopped else None}
+    material = bool(session_trades) or rebalanced or not any(
+        r["date"] == today for r in led["history"])
+    led["history"] = L.upsert_row(led["history"], row)
+    led["last_run"] = now.strftime("%Y-%m-%d %H:%M")
+    tlog["history"].extend(session_trades)
+    tlog["last_run"] = led["last_run"]
+    if material:
+        L.save(name, led)
+        L.save(name, tlog, "trades")
+        print(f"[{name}] ledger written")
+
+    gist.push(f"{name}_live.json", {
+        "book": name, "label": spec["label"], "updated_at": led["last_run"],
+        "equity": eq, "bankroll": led["bankroll"],
+        "pnl": round(eq - led["bankroll"], 2),
+        "day_pnl": row["pnl"], "stopped": row["stopped"],
+        "positions": [{"symbol": s, **pos}
+                      for s, pos in led["positions"].items()],
+        "last_prices": {s: round(v, 2) for s, v in last_px.items()
+                        if s in led["positions"]},
+        "notes": notes,
+    }, force=True)
+
+    lines = [f"## {spec['label']} — book ${day_start:,.2f} → ${eq:,.2f} today "
+             f"({row['pnl']:+,.2f})" + ("  ⛔ -2% stop" if stopped else "")]
+    lines += [f"- {a}" for a in actions] or ["- no action this run"]
+    return lines
 
 
 # --- one book, one run ---------------------------------------------------------
@@ -320,8 +492,9 @@ def main():
     # one broker per venue, created lazily; a venue with missing keys skips
     # loudly instead of poisoning the ledger with pretend fills
     KEYS = {"crypto": ("ALPACA_API_KEY", "ALPACA_SECRET_KEY"),
-            "fx": ("OANDA_API_KEY", "OANDA_ACCOUNT_ID")}
-    MAKERS = {"crypto": Broker, "fx": OandaBroker}
+            "fx": ("OANDA_API_KEY", "OANDA_ACCOUNT_ID"),
+            "equity": ("ALPACA_API_KEY", "ALPACA_SECRET_KEY")}
+    MAKERS = {"crypto": Broker, "fx": OandaBroker, "equity": Broker}
     brokers: dict = {}
 
     md = [f"# EdgeLab paper runner — {now:%Y-%m-%d %H:%M} UTC", ""]
@@ -339,7 +512,8 @@ def main():
                        f"missing secrets: {', '.join(k for k in KEYS[venue] if not os.getenv(k))}",
                        ""]
                 continue
-        md += run_book(name, spec, broker, gist, now) + [""]
+        runner = run_equity_book if venue == "equity" else run_book
+        md += runner(name, spec, broker, gist, now) + [""]
 
     report = "\n".join(md)
     print("\n" + report)

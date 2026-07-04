@@ -1,12 +1,13 @@
 """The book registry — every candidate strategy, its frozen rules, and where it
-sits on the gate ladder. Max two books may have `active: True` at once
-(METHODOLOGY.md: forward sessions are the scarce resource).
+sits on the gate ladder. Max three books may have `active: True` at once, one
+per venue (METHODOLOGY.md: forward sessions are the scarce resource).
 
 `gate_a_file` points at the committed research verdict (ledger/research/*.json,
 written by run_research.py) so the dashboard can show why a book was admitted.
 """
 
 from core.engine import run_trend, run_fade
+from core.equities import run_momentum
 
 BANKROLL = 10000.0
 DAILY_STOP_PCT = 0.02        # -2% daily loss stop (loss caps protect; profit caps don't)
@@ -14,6 +15,8 @@ DAILY_STOP_PCT = 0.02        # -2% daily loss stop (loss caps protect; profit ca
 # venue -> (data source, broker, accounting):
 #   "crypto": Coinbase candles, Alpaca paper spot (cash accounting, long-only)
 #   "fx":     OANDA candles,   OANDA practice margin (pnl accounting, shorts ok)
+#   "equity": Yahoo daily closes, Alpaca paper stocks (cash accounting,
+#             long-only, rebalance-to-weights on Mondays during market hours)
 
 BOOKS = {
     "crypto_trend": {
@@ -55,6 +58,34 @@ BOOKS = {
         "cost_bps": 2.7,                     # measured spread + slippage buffer
         "dd_budget_pct": 15.0,
         "gate_a_file": "fx_fade_1h",
+    },
+    "equity_momentum": {
+        "label": "US equity momentum (top 5)",
+        "venue": "equity",
+        # Book 3, the systematic "video 1": rank a fixed liquid large-cap
+        # universe by 63d return, hold the top 5 equal-weight, refresh weekly;
+        # cash when SPY < 200d SMA. Gate A: 16/16 grid cells pass at 2x costs;
+        # this cell wins 5/5 walk-forward folds (PF 1.94, DD 25.9% stressed)
+        # and sits on a passing plateau (lookback 21 and 126 neighbors pass).
+        # Known bias, on the record: fixed present-day universe -> survivorship;
+        # the forward ledger is the real test. ledger/research/momentum.json.
+        "active": True,
+        "rules_version": 1,
+        "fn": run_momentum,
+        "params": dict(lookback=63, top_k=5, rebal_days=5),
+        "universe": ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA",
+                     "AMD", "AVGO", "CRM", "ADBE", "NFLX", "INTC", "CSCO",
+                     "ORCL", "QCOM", "MU", "TXN", "IBM", "PYPL", "JPM", "BAC",
+                     "GS", "V", "MA", "XOM", "CVX", "COP", "UNH", "JNJ", "PFE",
+                     "MRK", "LLY", "WMT", "COST", "HD", "MCD", "NKE", "SBUX",
+                     "DIS", "BA", "CAT", "GE", "F", "T", "VZ"],
+        "regime_symbol": "SPY",
+        "symbols": {},                       # panel book; universe above
+        "interval": "1d",
+        "history_years": 2.0,                # live window (research uses 10y)
+        "cost_bps": 6.0,
+        "dd_budget_pct": 25.0,
+        "gate_a_file": "equity_momentum",
     },
     # Candidates — researched by run_research.py; a candidate becomes active
     # only by passing Gate A (and only if a book slot is free).
@@ -106,5 +137,7 @@ BOOKS = {
 
 def active_books() -> dict:
     act = {k: v for k, v in BOOKS.items() if v["active"]}
-    assert len(act) <= 2, "METHODOLOGY: max two concurrent paper books"
+    assert len(act) <= 3, "METHODOLOGY: max three paper books, one per venue"
+    venues = [v.get("venue", "crypto") for v in act.values()]
+    assert len(venues) == len(set(venues)), "METHODOLOGY: one book per venue"
     return act

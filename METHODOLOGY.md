@@ -20,10 +20,11 @@ Consequences baked into the design:
   The scoreboard is the monthly average.
 - **Daily loss stop stays** (-2% of book): loss caps genuinely protect a book;
   profit caps mostly don't.
-- **Venues chosen by cost structure**: BTC/ETH crypto (and later micro futures)
-  only — deep books, ~2–5bps effective costs, 24/7 sessions. No low-float stocks,
-  no premarket, no thin-book execution environments. Quick trading is a war
-  against the spread; we don't volunteer for the hardest front.
+- **Venues chosen by cost structure**: deep books and single-digit-bps effective
+  costs only — BTC/ETH crypto (24/7), majors FX at measured spread, and liquid
+  US large caps on daily bars (~1–3bps spread, zero commission). No low-float
+  stocks, no premarket, no thin-book execution environments. Quick trading is a
+  war against the spread; we don't volunteer for the hardest front.
 
 ## The gate ladder (enforced by `core/gates.py`)
 
@@ -39,8 +40,11 @@ Backtests choose candidates. Only the forward ledger promotes them.
 
 ## Operating rules
 
-- **Two concurrent paper books maximum.** Forward sessions are the scarce
-  resource; attention is split two ways, not five.
+- **Three concurrent paper books maximum, one per venue** (crypto, FX,
+  equities). Forward sessions are the scarce resource; attention is split by
+  venue, not by whim. *(Amended 2026-07-04 from two: the equity momentum book
+  trades daily bars on its own venue and does not compete for the intraday
+  attention budget of the other two.)*
 - **Ledgers are the source of truth**: committed JSON in `ledger/`, one schema for
   every book, per-trade logs storing *intended* vs *filled* prices with the gap
   computed every session. Rule changes bump `rules_version` and re-stamp the

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-04 00:15",
+  "generated": "2026-07-04 21:10",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -103,6 +103,32 @@
           }
         ]
       },
+      "gate_c": null
+    },
+    "equity_momentum": {
+      "label": "US equity momentum (top 5)",
+      "active": true,
+      "interval": "1d",
+      "dd_budget_pct": 25.0,
+      "rules_version": 1,
+      "deployment_date": null,
+      "sessions": 0,
+      "pnl": 0,
+      "rolling_avg": null,
+      "rolling_window_filled": 0,
+      "stage": "awaiting_paper",
+      "gate_a": {
+        "passed": true,
+        "generated": "2026-07-04 21:09",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": true,
+            "detail": "panel book, 10y, stressed +593.1% PF 1.94 DD 25.9% folds 5/5; survivorship bias disclosed (fixed present-day universe)"
+          }
+        ]
+      },
+      "gate_b": null,
       "gate_c": null
     },
     "crypto_trend_1h": {

@@ -68,6 +68,23 @@ def test_adx_gate_reduces_trades():
     tight = run_channel(df, cost_bps=20, adx_min=25.0)
     assert len(tight["trades"]) <= len(open_gate["trades"])
 
+def test_momentum_regime_gate_goes_to_cash():
+    from core.equities import run_momentum, momentum_targets
+    rng = np.random.default_rng(7)
+    n, dates = 700, pd.date_range("2022-01-03", periods=700, freq="B")
+    up = pd.DataFrame({f"S{i}": 100 * np.exp(np.cumsum(
+        rng.normal(0.001 * (i + 1), 0.01, n))) for i in range(6)}, index=dates)
+    spy_up = pd.Series(100 * np.exp(np.cumsum(rng.normal(0.0006, 0.008, n))),
+                       index=dates)
+    res = run_momentum(up, spy_up, lookback=63, top_k=3, rebal_days=5,
+                       cost_bps=12.0)
+    assert res["trades"] and res["end"] > 10000
+    # SPY collapsing below its 200d SMA must force all-cash targets
+    spy_down = pd.Series(np.linspace(200, 80, n), index=dates)
+    assert momentum_targets(up, spy_down, lookback=63, top_k=3) == {}
+    tgt = momentum_targets(up, spy_up, lookback=63, top_k=3)
+    assert len(tgt) <= 3 and abs(sum(tgt.values()) - 1.0) < 1e-9
+
 def test_volume_filter_reduces_fade_trades():
     closes = trending_up(800, drift=0.15)
     closes[300:305] -= 8
