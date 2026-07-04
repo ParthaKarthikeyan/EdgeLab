@@ -1,0 +1,263 @@
+{
+  "generated": "2026-07-04 18:44",
+  "universe": [
+    "BTC/USD",
+    "ETH/USD",
+    "SOL/USD",
+    "XRP/USD",
+    "DOGE/USD",
+    "LTC/USD",
+    "LINK/USD",
+    "AVAX/USD",
+    "DOT/USD",
+    "BCH/USD",
+    "UNI/USD"
+  ],
+  "sma_filter": 100,
+  "cost_bps_stressed": 40.0,
+  "cells_passing_gate_a": 12,
+  "cells_total": 16,
+  "recommendations": [],
+  "cells": [
+    {
+      "params": {
+        "lookback": 14,
+        "top_k": 2,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 255.1,
+      "ret": 115.9,
+      "pf": 1.31,
+      "max_dd": 63.6,
+      "trades": 249,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 14,
+        "top_k": 2,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 46.9,
+      "ret": 12.0,
+      "pf": 1.16,
+      "max_dd": 66.7,
+      "trades": 136,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 14,
+        "top_k": 3,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 184.8,
+      "ret": 86.2,
+      "pf": 1.31,
+      "max_dd": 61.1,
+      "trades": 319,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 14,
+        "top_k": 3,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 68.9,
+      "ret": 34.2,
+      "pf": 1.24,
+      "max_dd": 58.4,
+      "trades": 173,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 30,
+        "top_k": 2,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 201.5,
+      "ret": 106.8,
+      "pf": 1.31,
+      "max_dd": 62.5,
+      "trades": 189,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 30,
+        "top_k": 2,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 23.8,
+      "ret": 1.9,
+      "pf": 1.12,
+      "max_dd": 66.2,
+      "trades": 98,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 30,
+        "top_k": 3,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 171.9,
+      "ret": 94.4,
+      "pf": 1.35,
+      "max_dd": 59.1,
+      "trades": 252,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 30,
+        "top_k": 3,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 40.0,
+      "ret": 18.4,
+      "pf": 1.17,
+      "max_dd": 56.7,
+      "trades": 126,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 60,
+        "top_k": 2,
+        "rebal_days": 2
+      },
+      "passed": false,
+      "last_fold_ok": false,
+      "base_ret": 4.1,
+      "ret": -19.8,
+      "pf": 1.1,
+      "max_dd": 75.4,
+      "trades": 130,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 60,
+        "top_k": 2,
+        "rebal_days": 7
+      },
+      "passed": false,
+      "last_fold_ok": false,
+      "base_ret": 6.8,
+      "ret": -8.9,
+      "pf": 1.08,
+      "max_dd": 64.9,
+      "trades": 79,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 60,
+        "top_k": 3,
+        "rebal_days": 2
+      },
+      "passed": false,
+      "last_fold_ok": false,
+      "base_ret": 6.0,
+      "ret": -17.3,
+      "pf": 1.11,
+      "max_dd": 70.1,
+      "trades": 186,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 60,
+        "top_k": 3,
+        "rebal_days": 7
+      },
+      "passed": false,
+      "last_fold_ok": false,
+      "base_ret": 6.5,
+      "ret": -6.6,
+      "pf": 1.07,
+      "max_dd": 60.7,
+      "trades": 98,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 90,
+        "top_k": 2,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 192.9,
+      "ret": 128.4,
+      "pf": 1.35,
+      "max_dd": 65.1,
+      "trades": 125,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 90,
+        "top_k": 2,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 178.1,
+      "ret": 145.1,
+      "pf": 1.45,
+      "max_dd": 58.4,
+      "trades": 64,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 90,
+        "top_k": 3,
+        "rebal_days": 2
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 87.2,
+      "ret": 48.2,
+      "pf": 1.27,
+      "max_dd": 60.5,
+      "trades": 176,
+      "folds_won": 3
+    },
+    {
+      "params": {
+        "lookback": 90,
+        "top_k": 3,
+        "rebal_days": 7
+      },
+      "passed": true,
+      "last_fold_ok": false,
+      "base_ret": 116.0,
+      "ret": 91.3,
+      "pf": 1.33,
+      "max_dd": 53.2,
+      "trades": 92,
+      "folds_won": 3
+    }
+  ]
+}
