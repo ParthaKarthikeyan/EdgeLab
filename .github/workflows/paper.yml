@@ -34,10 +34,14 @@ jobs:
           OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
-        run: |
-          python run_paper.py
-          python run_status.py
+        run: python run_paper.py
+      - name: Build status
+        if: always()      # a broken book must not hide the healthy ones
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: python run_status.py
       - name: Commit ledgers
+        if: always()
         run: |
           git config user.name "edgelab-bot"
           git config user.email "actions@users.noreply.github.com"

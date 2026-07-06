@@ -498,6 +498,7 @@ def main():
     brokers: dict = {}
 
     md = [f"# EdgeLab paper runner — {now:%Y-%m-%d %H:%M} UTC", ""]
+    errors = 0
     for name, spec in active_books().items():
         venue = spec.get("venue", "crypto")
         if args.dry_run:
@@ -513,7 +514,15 @@ def main():
                        ""]
                 continue
         runner = run_equity_book if venue == "equity" else run_book
-        md += runner(name, spec, broker, gist, now) + [""]
+        try:
+            md += runner(name, spec, broker, gist, now) + [""]
+        except Exception as e:  # noqa: BLE001 — one book must not kill the rest
+            errors += 1
+            md += [f"## {spec['label']} — ERROR",
+                   f"{type(e).__name__}: {e}",
+                   "book skipped this run; other books and the status build "
+                   "continue", ""]
+            print(f"[error] {name}: {type(e).__name__}: {e}")
 
     report = "\n".join(md)
     print("\n" + report)
@@ -521,6 +530,10 @@ def main():
     if sp:
         with open(sp, "a", encoding="utf-8") as f:
             f.write(report + "\n")
+    if errors:
+        # healthy books' ledgers are already written/committed by the workflow;
+        # exit nonzero so the failure email still fires for the broken book
+        raise SystemExit(f"{errors} book(s) errored this run")
 
 
 if __name__ == "__main__":
