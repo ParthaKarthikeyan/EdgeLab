@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-07 00:17",
+  "generated": "2026-07-08 00:09",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -10,10 +10,10 @@
       "dd_budget_pct": 20.0,
       "rules_version": 2,
       "deployment_date": "2026-07-04",
-      "sessions": 4,
+      "sessions": 5,
       "pnl": 0.0,
       "rolling_avg": 0.0,
-      "rolling_window_filled": 4,
+      "rolling_window_filled": 5,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -33,7 +33,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "4 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "5 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -61,10 +61,10 @@
       "dd_budget_pct": 15.0,
       "rules_version": 1,
       "deployment_date": "2026-07-03",
-      "sessions": 5,
+      "sessions": 6,
       "pnl": 0.0,
       "rolling_avg": 0.0,
-      "rolling_window_filled": 5,
+      "rolling_window_filled": 6,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -84,7 +84,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "5 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "6 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -112,10 +112,10 @@
       "dd_budget_pct": 25.0,
       "rules_version": 1,
       "deployment_date": "2026-07-04",
-      "sessions": 4,
+      "sessions": 5,
       "pnl": -0.88,
-      "rolling_avg": -0.22,
-      "rolling_window_filled": 4,
+      "rolling_avg": -0.18,
+      "rolling_window_filled": 5,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -135,7 +135,7 @@
           {
             "name": "evidence",
             "passed": false,
-            "detail": "4 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "5 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -145,7 +145,7 @@
           {
             "name": "drawdown_in_budget",
             "passed": true,
-            "detail": "max DD 0.1% vs budget 25%"
+            "detail": "max DD 4.5% vs budget 25%"
           },
           {
             "name": "reconciliation",
