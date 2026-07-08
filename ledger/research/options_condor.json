@@ -1,0 +1,51 @@
+{
+  "book": "options_condor",
+  "label": "QQQ 1-DTE iron condor",
+  "interval": "1d",
+  "params": {
+    "put_off": 2.5,
+    "call_off": 2.25,
+    "width": 5,
+    "profit_take": null,
+    "vix_gate": true
+  },
+  "cost_model": {
+    "slip_per_leg": 0.01,
+    "fee_per_leg_contract": 0.05,
+    "stress": 2.0
+  },
+  "generated": "2026-07-08 19:16",
+  "passed": true,
+  "note": "QQQ 1-DTE condor 2.5%/2.25% w$5 hold-to-expiry vix<20: stressed +3.6% PF 1.12 WR 91.1% DD 9.8% over 135 trades, folds 3/5; worst day -493, worst-3 [-493.4, -479.4, -432.4]. Bars-only data (no historical quotes) \u2014 slippage haircut is the budget for stale OTM marks.",
+  "cell": {
+    "params": {
+      "put_off": 2.5,
+      "call_off": 2.25,
+      "width": 5,
+      "profit_take": null,
+      "vix_gate": true
+    },
+    "passed": true,
+    "last_fold_ok": true,
+    "base_ret": 8.7,
+    "ret": 3.6,
+    "pf": 1.12,
+    "win_rate": 91.1,
+    "max_dd": 9.8,
+    "trades": 135,
+    "folds_won": 3,
+    "worst_day": -493.4,
+    "worst3": [
+      -493.4,
+      -479.4,
+      -432.4
+    ],
+    "skips": {
+      "missing_leg_data": 130,
+      "thin_credit": 176,
+      "risk_budget_too_small": 31,
+      "no_underlying_data": 9,
+      "vix_gate": 124
+    }
+  }
+}

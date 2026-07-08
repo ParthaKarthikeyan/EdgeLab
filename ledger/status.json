@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-08 17:48",
+  "generated": "2026-07-08 19:16",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -154,6 +154,32 @@
           }
         ]
       },
+      "gate_c": null
+    },
+    "options_condor": {
+      "label": "QQQ 1-DTE iron condor",
+      "active": false,
+      "interval": "1d",
+      "dd_budget_pct": 20.0,
+      "rules_version": 1,
+      "deployment_date": null,
+      "sessions": 0,
+      "pnl": 0,
+      "rolling_avg": null,
+      "rolling_window_filled": 0,
+      "stage": "awaiting_paper",
+      "gate_a": {
+        "passed": true,
+        "generated": "2026-07-08 19:16",
+        "checks": [
+          {
+            "name": "all_symbols_pass",
+            "passed": true,
+            "detail": "QQQ 1-DTE condor 2.5%/2.25% w$5 hold-to-expiry vix<20: stressed +3.6% PF 1.12 WR 91.1% DD 9.8% over 135 trades, folds 3/5; worst day -493, worst-3 [-493.4, -479.4, -432.4]. Bars-only data (no historical quotes) \u2014 slippage haircut is the budget for stale OTM marks."
+          }
+        ]
+      },
+      "gate_b": null,
       "gate_c": null
     },
     "crypto_trend_1h": {
