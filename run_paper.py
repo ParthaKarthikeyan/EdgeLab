@@ -294,8 +294,9 @@ def run_equity_book(name: str, spec: dict, broker, gist, now) -> list:
                      + len(session_trades),
            "open_positions": len(led["positions"]),
            "stopped": "loss_stop" if stopped else None}
-    material = bool(session_trades) or rebalanced or not any(
-        r["date"] == today for r in led["history"])
+    prev = next((r for r in led["history"] if r["date"] == today), None)
+    material = (bool(session_trades) or rebalanced or prev is None
+                or prev.get("book_end") != row["book_end"])
     led["history"] = L.upsert_row(led["history"], row)
     led["last_run"] = now.strftime("%Y-%m-%d %H:%M")
     tlog["history"].extend(session_trades)
@@ -449,8 +450,9 @@ def run_book(name: str, spec: dict, broker, gist, now) -> list:
                      + len(session_trades),
            "open_positions": len(led["positions"]),
            "stopped": "loss_stop" if stopped else None}
-    material = bool(session_trades) or not any(
-        r["date"] == today for r in led["history"])
+    prev = next((r for r in led["history"] if r["date"] == today), None)
+    material = (bool(session_trades) or prev is None
+                or prev.get("book_end") != row["book_end"])
     led["history"] = L.upsert_row(led["history"], row)
     led["last_run"] = now.strftime("%Y-%m-%d %H:%M")
     tlog["history"].extend(session_trades)
