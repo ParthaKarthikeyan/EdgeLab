@@ -69,11 +69,13 @@ def sessions(start: str, end: str) -> list[str]:
 
 def get_stock_bars(symbol: str, start: str, end: str,
                    timeframe: str = "5Min") -> pd.DataFrame:
-    """SIP bars, ET-indexed. Free plan serves full history (15-min delay)."""
+    """IEX bars, ET-indexed (SIP is subscription-gated on this account).
+    IEX covers a few % of consolidated volume, but for QQQ that is still
+    constant prints — good enough to round a strike to the $1 grid."""
     rows, token = [], None
     while True:
         params = {"symbols": symbol, "timeframe": timeframe,
-                  "start": start, "end": end, "feed": "sip",
+                  "start": start, "end": end, "feed": "iex",
                   "adjustment": "raw", "limit": 10000}
         if token:
             params["page_token"] = token

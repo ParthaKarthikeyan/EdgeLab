@@ -1,5 +1,5 @@
 """The book registry — every candidate strategy, its frozen rules, and where it
-sits on the gate ladder. Max three books may have `active: True` at once, one
+sits on the gate ladder. Max four books may have `active: True` at once, one
 per venue (METHODOLOGY.md: forward sessions are the scarce resource).
 
 `gate_a_file` points at the committed research verdict (ledger/research/*.json,
@@ -13,10 +13,13 @@ BANKROLL = 10000.0
 DAILY_STOP_PCT = 0.02        # -2% daily loss stop (loss caps protect; profit caps don't)
 
 # venue -> (data source, broker, accounting):
-#   "crypto": Coinbase candles, Alpaca paper spot (cash accounting, long-only)
-#   "fx":     OANDA candles,   OANDA practice margin (pnl accounting, shorts ok)
-#   "equity": Yahoo daily closes, Alpaca paper stocks (cash accounting,
-#             long-only, rebalance-to-weights on Mondays during market hours)
+#   "crypto":  Coinbase candles, Alpaca paper spot (cash accounting, long-only)
+#   "fx":      OANDA candles,   OANDA practice margin (pnl accounting, shorts ok)
+#   "equity":  Yahoo daily closes, Alpaca paper stocks (cash accounting,
+#              long-only, rebalance-to-weights on Mondays during market hours)
+#   "options": Alpaca option quotes/bars, Alpaca paper mleg orders (credit
+#              accounting: cash holds the credit, open structures are marked
+#              as liabilities; defined-risk spreads only — wings are the stop)
 
 BOOKS = {
     "crypto_trend": {
@@ -87,6 +90,26 @@ BOOKS = {
         "dd_budget_pct": 25.0,
         "gate_a_file": "equity_momentum",
     },
+    "options_condor": {
+        "label": "QQQ 1-DTE iron condor",
+        "venue": "options",
+        # Book 4 candidate (the "$300 options challenge" videos): sell a
+        # defined-risk QQQ condor at 14:30 ET expiring next session; the
+        # wings are the only stop. Params are FROZEN from the Gate A verdict
+        # (ledger/research/options_condor.json) before activation; the values
+        # below are the video's cell as a placeholder until then.
+        "active": False,
+        "rules_version": 1,
+        "fn": None,                          # bespoke runner: run_condor_paper.py
+        "params": dict(put_off=2.0, call_off=1.75, width=1, profit_take=0.3,
+                       vix_gate=True, risk_pct=0.05),
+        "symbols": {"QQQ": "QQQ"},
+        "interval": "1d",
+        "history_years": 2.4,                # Alpaca option bars begin 2024-02
+        "cost_bps": 0.0,                     # costs are $/leg, not bps (options.py)
+        "dd_budget_pct": 20.0,
+        "gate_a_file": "options_condor",
+    },
     # Candidates — researched by run_research.py; a candidate becomes active
     # only by passing Gate A (and only if a book slot is free).
     "crypto_trend_1h": {
@@ -137,7 +160,7 @@ BOOKS = {
 
 def active_books() -> dict:
     act = {k: v for k, v in BOOKS.items() if v["active"]}
-    assert len(act) <= 3, "METHODOLOGY: max three paper books, one per venue"
+    assert len(act) <= 4, "METHODOLOGY: max four paper books, one per venue"
     venues = [v.get("venue", "crypto") for v in act.values()]
     assert len(venues) == len(set(venues)), "METHODOLOGY: one book per venue"
     return act

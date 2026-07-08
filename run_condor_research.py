@@ -49,18 +49,24 @@ def fetch_days() -> list[dict]:
     print(f"[calendar] {len(cal)} sessions {cal[0]} .. {cal[-1]}")
 
     qqq5 = get_stock_bars("QQQ", START, today, "5Min")
-    qqq1d = get_stock_bars("QQQ", START, today, "1Day")
-    daily_close = {ts.strftime("%Y-%m-%d"): float(c)
-                   for ts, c in qqq1d["c"].items()}
-    print(f"[qqq] {len(qqq5)} 5-min bars, {len(daily_close)} daily closes")
 
+    # official closes (settlement) and VIX from Yahoo — IEX closes can drift
+    # a few cents from the consolidated close that options settle against
     import yfinance as yf
-    vix = yf.download("^VIX", start=START, interval="1d",
-                      progress=False, auto_adjust=False)["Close"]
-    if isinstance(vix, pd.DataFrame):
-        vix = vix.iloc[:, 0]
-    vix.index = vix.index.strftime("%Y-%m-%d")
-    print(f"[vix] {len(vix)} daily closes")
+
+    def daily_series(ticker: str) -> pd.Series:
+        s = yf.download(ticker, start=START, interval="1d",
+                        progress=False, auto_adjust=False)["Close"]
+        if isinstance(s, pd.DataFrame):
+            s = s.iloc[:, 0]
+        s.index = s.index.strftime("%Y-%m-%d")
+        return s
+
+    qqq_daily = daily_series("QQQ")
+    daily_close = {d: float(v) for d, v in qqq_daily.items()}
+    vix = daily_series("^VIX")
+    print(f"[qqq] {len(qqq5)} 5-min bars, {len(daily_close)} daily closes; "
+          f"[vix] {len(vix)} closes")
 
     days, fetched = [], 0
     for i, d in enumerate(cal[:-1]):

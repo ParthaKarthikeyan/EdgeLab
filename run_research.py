@@ -91,7 +91,7 @@ def main():
     lines = ["# EdgeLab research — Gate A verdicts", ""]
     for name in names:
         spec = BOOKS[name]
-        if spec.get("venue") == "equity":
+        if spec.get("venue") in ("equity", "options"):
             print(f"[research] {name}: panel book — researched by "
                   "run_momentum_research.py, skipping here")
             continue

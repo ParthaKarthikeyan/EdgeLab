@@ -1,0 +1,63 @@
+# QQQ 1-DTE condor paper runner — four short runs per trading day (ET):
+#   10:00 profit-take check · 12:30 profit-take check
+#   14:25 close-expiring + entry · 15:45 force-close before expiry
+#
+# PRIMARY trigger: workflow_dispatch from an external scheduler (cron-job.org),
+# because GitHub cron can queue 30-60+ min. The schedule below is a FALLBACK;
+# every action in the runner sits behind an ET time-window guard, so a late
+# fallback run degrades to a harmless mark-to-market.
+name: condor
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "5 14 * * 1-5"     # ~10:05 ET (EDT) fallback
+    - cron: "35 16 * * 1-5"    # ~12:35 ET
+    - cron: "25 18 * * 1-5"    # ~14:25 ET — the entry window
+    - cron: "45 19 * * 1-5"    # ~15:45 ET — force-close window
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ledger-writes
+  cancel-in-progress: false
+
+jobs:
+  condor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run condor book
+        env:
+          PYTHONUNBUFFERED: "1"
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: python run_condor_paper.py
+      - name: Build status
+        if: always()
+        run: python run_status.py
+      - name: Commit ledgers
+        if: always()
+        run: |
+          git config user.name "edgelab-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ledger/
+          if git diff --cached --quiet; then
+            echo "no ledger changes"
+          else
+            git commit -m "condor: ledger update $(date -u +'%Y-%m-%d %H:%M')"
+            for i in 1 2 3; do
+              git pull --rebase origin master && git push && break
+              echo "push attempt $i failed; retrying"
+              sleep $((i * 5))
+            done
+          fi

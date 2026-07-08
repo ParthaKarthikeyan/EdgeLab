@@ -503,6 +503,8 @@ def main():
     errors = 0
     for name, spec in active_books().items():
         venue = spec.get("venue", "crypto")
+        if venue == "options":
+            continue          # bespoke schedule: run_condor_paper.py / condor.yml
         if args.dry_run:
             broker = None
         else:
