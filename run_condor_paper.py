@@ -288,12 +288,13 @@ def main():
         led["positions"].pop(key)
 
     # ---- mark open positions ----
-    marks = {}
+    marks, qcache = {}, {}
     for key, pos in led["positions"].items():
         syms = [leg["symbol"] for leg in pos["legs"]]
         if args.dry_run:
             continue
         q = latest_quotes(syms)
+        qcache[key] = q
         mark = 0.0
         for leg in pos["legs"]:
             bid, ask = q.get(leg["symbol"], (0.0, 0.0))
@@ -312,12 +313,23 @@ def main():
     open_now = market_open() if not args.dry_run else False
 
     def close_position(key: str, reason: str):
+        """Buy back the shorts always; sell long wings only if they still bid.
+        A $0-bid long wing is left to expire — OTM longs die at zero and are
+        never auto-exercised, so leaving them carries no assignment risk
+        (unlike a market sell into an empty book, which can reject)."""
         pos = led["positions"][key]
-        legs = [{"symbol": leg["symbol"], "ratio_qty": "1",
-                 "side": "buy" if leg["side"] == "short" else "sell",
-                 "position_intent": ("buy_to_close" if leg["side"] == "short"
-                                     else "sell_to_close")}
-                for leg in pos["legs"]]
+        q = qcache.get(key, {})
+        legs, left = [], []
+        for leg in pos["legs"]:
+            if leg["side"] == "short":
+                legs.append({"symbol": leg["symbol"], "ratio_qty": "1",
+                             "side": "buy", "position_intent": "buy_to_close"})
+            elif q.get(leg["symbol"], (0.0, 0.0))[0] > 0:
+                legs.append({"symbol": leg["symbol"], "ratio_qty": "1",
+                             "side": "sell",
+                             "position_intent": "sell_to_close"})
+            else:
+                left.append(leg["symbol"])
         o = place_mleg(legs, pos["contracts"], "close")
         debit = leg_fill_net(o)
         if debit is None:
@@ -335,7 +347,9 @@ def main():
             entry_price=pos["credit"], exit_price=debit, reason=reason)
         session_trades.append(tr)
         actions.append(f"{key}: CLOSED @ {debit:.2f} ({reason}) "
-                       f"pnl {tr['pnl']:+,.2f}")
+                       f"pnl {tr['pnl']:+,.2f}"
+                       + (f" · zero-bid wings left to expire: "
+                          f"{', '.join(left)}" if left else ""))
         led["positions"].pop(key)
         marks.pop(key, None)
 

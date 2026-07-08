@@ -14,7 +14,7 @@ everything here is that document turned into code.
 | Target | +1% *per day* (daily governor) | +$100/day *monthly average* (no profit caps) |
 | Venues | premarket low-floats, futures, crypto | crypto, majors FX, liquid US large caps — chosen by cost structure |
 | Admission | strategies deployed, then measured | Gate A (2x-cost walk-forward) **before** any bot exists |
-| Books | as many as we built | max three paper books, one per venue |
+| Books | as many as we built | max four paper books, one per venue |
 | Honesty | added later (rules_version, fills) | intended-vs-filled per trade from day one |
 
 ## Layout

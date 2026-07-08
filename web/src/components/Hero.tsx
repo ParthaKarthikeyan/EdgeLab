@@ -52,8 +52,8 @@ export default function Hero({ status }: { status: Status }) {
           <Stat label="Sessions" value={sessions} sub="forward, current rules" />
           <Stat
             label="Books live"
-            value={`${active.length} / 3`}
-            sub="max three — one per venue"
+            value={`${active.length} / 4`}
+            sub="max four — one per venue"
           />
         </div>
       </div>

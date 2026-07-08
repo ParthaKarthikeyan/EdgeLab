@@ -93,15 +93,17 @@ BOOKS = {
     "options_condor": {
         "label": "QQQ 1-DTE iron condor",
         "venue": "options",
-        # Book 4 candidate (the "$300 options challenge" videos): sell a
-        # defined-risk QQQ condor at 14:30 ET expiring next session; the
-        # wings are the only stop. Params are FROZEN from the Gate A verdict
-        # (ledger/research/options_condor.json) before activation; the values
-        # below are the video's cell as a placeholder until then.
-        "active": False,
+        # Book 4 (the "$300 options challenge" videos): sell a defined-risk
+        # QQQ condor at ~14:30 ET expiring next session; the wings are the
+        # only stop. The video's own cell ($1 wings, 30% profit-take) FAILED
+        # Gate A at conservative fills — what passed is wider: 2.5%/2.25%
+        # offsets, $5 wings, hold to expiry, VIX<20 gate (stressed +3.6%,
+        # PF 1.12, WR 91%, DD 9.8%, 135 trades, 3/5 folds, last fold ok,
+        # offset-neighbor passes). ledger/research/options_condor.json.
+        "active": True,
         "rules_version": 1,
         "fn": None,                          # bespoke runner: run_condor_paper.py
-        "params": dict(put_off=2.0, call_off=1.75, width=1, profit_take=0.3,
+        "params": dict(put_off=2.5, call_off=2.25, width=5, profit_take=None,
                        vix_gate=True, risk_pct=0.05),
         "symbols": {"QQQ": "QQQ"},
         "interval": "1d",
