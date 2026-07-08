@@ -24,7 +24,10 @@ export default function ResearchCard({ docs }: { docs: Research[] }) {
                 </Badge>
               </div>
               <span className="font-mono text-[11px] text-ink-500">
-                stress {doc.cost_bps_stressed}bps rt · {doc.generated}
+                {doc.cost_bps_stressed !== undefined
+                  ? `stress ${doc.cost_bps_stressed}bps rt · `
+                  : 'stress 2x $-costs · '}
+                {doc.generated}
               </span>
             </div>
             {!doc.symbols && doc.note && (

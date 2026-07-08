@@ -105,8 +105,9 @@ export interface Research {
   book: string
   label: string
   interval: string
-  cost_bps_base: number
-  cost_bps_stressed: number
+  /** bps-cost books; the options book prices costs in $/leg instead. */
+  cost_bps_base?: number
+  cost_bps_stressed?: number
   generated: string
   passed: boolean
   /** Per-symbol books have this; panel books (e.g. equity momentum) don't. */

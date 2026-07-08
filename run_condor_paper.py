@@ -20,6 +20,7 @@ reject time_in_force, so none is sent.
 
     python run_condor_paper.py            # normal (needs ALPACA keys)
     python run_condor_paper.py --dry-run  # decisions only, no orders
+    python run_condor_paper.py --probe    # read-only account/market checks
 """
 
 import argparse
@@ -182,11 +183,64 @@ def leg_fill_net(order: dict) -> float | None:
     return net
 
 
+# --- read-only pre-flight (account level, contracts, NBBO) ---------------------
+def probe():
+    """No orders, no ledger writes — proves the whole read path works."""
+    p = BOOKS[BOOK]["params"]
+    acct = _req("GET", f"{TRADE_URL}/v2/account")
+    lvl = int(acct.get("options_trading_level")
+              or acct.get("options_approved_level") or 0)
+    print(f"[probe] options_trading_level={lvl} "
+          f"(approved={acct.get('options_approved_level')}) "
+          f"buying_power=${float(acct.get('options_buying_power') or 0):,.0f}")
+    if lvl < 3:
+        print("[probe] LEVEL < 3 — multi-leg spreads will be rejected. "
+              "Enable options level 3 in the paper account settings.")
+    today = pd.Timestamp.now(tz=ET).strftime("%Y-%m-%d")
+    cal = next_sessions(today)
+    expiry = next((d for d in cal if d > today), None)
+    spot = latest_spot()
+    vix = vix_prev_close(today)
+    print(f"[probe] spot QQQ {spot:.2f} · next expiry {expiry} · "
+          f"prev VIX close {vix}")
+    tsp, tlp, tsc, tlc = cell_strikes(spot, p["put_off"], p["call_off"],
+                                      p["width"])
+    picks = {}
+    for name, cp, target in (("sp", "P", tsp), ("lp", "P", tlp),
+                             ("sc", "C", tsc), ("lc", "C", tlc)):
+        c = find_contract(expiry, cp, target)
+        picks[name] = c
+        print(f"[probe] {name} target {target:g} -> "
+              f"{c['symbol'] if c else 'NOT FOUND'}")
+    if all(picks.values()):
+        q = latest_quotes([c["symbol"] for c in picks.values()])
+        for name, c in picks.items():
+            bid, ask = q.get(c["symbol"], (0.0, 0.0))
+            print(f"[probe] {c['symbol']}: bid {bid:.2f} ask {ask:.2f}")
+        credit = (q[picks["sp"]["symbol"]][0] + q[picks["sc"]["symbol"]][0]
+                  - q[picks["lp"]["symbol"]][1] - q[picks["lc"]["symbol"]][1])
+        width_eff = min(float(picks["sp"]["strike_price"])
+                        - float(picks["lp"]["strike_price"]),
+                        float(picks["lc"]["strike_price"])
+                        - float(picks["sc"]["strike_price"]))
+        max_loss = (width_eff - credit) * 100
+        n = int(10000 * p["risk_pct"] // max_loss) if max_loss > 0 else 0
+        print(f"[probe] conservative credit {credit:.2f} · width {width_eff:g} "
+              f"· max loss ${max_loss:,.0f}/contract · would size {n}x")
+    print("[probe] done — read path OK")
+
+
 # --- the run --------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser(description="EdgeLab condor paper runner")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--probe", action="store_true",
+                    help="read-only account/contract/quote checks; no orders")
     args = ap.parse_args()
+
+    if args.probe:
+        probe()
+        return
 
     spec = BOOKS[BOOK]
     if not spec["active"]:

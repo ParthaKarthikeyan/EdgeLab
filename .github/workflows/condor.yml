@@ -9,7 +9,12 @@
 name: condor
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: "Read-only account/contract/quote checks (no orders)"
+        required: false
+        default: ""
   schedule:
     - cron: "5 14 * * 1-5"     # ~10:05 ET (EDT) fallback
     - cron: "35 16 * * 1-5"    # ~12:35 ET
@@ -41,7 +46,12 @@ jobs:
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
-        run: python run_condor_paper.py
+        run: |
+          if [ -n "${{ github.event.inputs.probe }}" ]; then
+            python run_condor_paper.py --probe
+          else
+            python run_condor_paper.py
+          fi
       - name: Build status
         if: always()
         run: python run_status.py
