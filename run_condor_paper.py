@@ -15,8 +15,8 @@ and a position expires on the books, the next run settles it from the
 official close of the expiry day — the ledger self-heals.
 
 Orders are Alpaca multi-leg ("mleg") MARKET orders on the paper account —
-fine for paper; switch to marketable limits before real money. mleg orders
-reject time_in_force, so none is sent.
+fine for paper; switch to marketable limits before real money. Options
+orders accept exactly one time_in_force: "day".
 
     python run_condor_paper.py            # normal (needs ALPACA keys)
     python run_condor_paper.py --dry-run  # decisions only, no orders
@@ -160,6 +160,7 @@ def find_contract(expiry: str, cp: str, target: float) -> dict | None:
 def place_mleg(legs: list[dict], qty: int, tag: str) -> dict:
     """Market mleg order; poll to a terminal state. Returns the final order."""
     body = {"order_class": "mleg", "qty": str(qty), "type": "market",
+            "time_in_force": "day",       # the only TIF options orders accept
             "client_order_id": f"el-{BOOK}-{tag}-{uuid.uuid4().hex[:8]}",
             "legs": legs}
     o = _req("POST", f"{TRADE_URL}/v2/orders", json=body)
