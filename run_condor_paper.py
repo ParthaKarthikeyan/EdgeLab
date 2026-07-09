@@ -462,8 +462,11 @@ def main():
            "open_positions": len(led["positions"]),
            "stopped": "loss_stop" if stopped else None}
     prev = next((r for r in led["history"] if r["date"] == today), None)
+    # entries move cash INTO a matching liability, so book_end alone can be
+    # unchanged by a fill — position count must count as material too
     material = (bool(session_trades) or prev is None
-                or prev.get("book_end") != row["book_end"])
+                or prev.get("book_end") != row["book_end"]
+                or prev.get("open_positions") != row["open_positions"])
     led["history"] = L.upsert_row(led["history"], row)
     led["last_run"] = now_et.strftime("%Y-%m-%d %H:%M")
     tlog["history"].extend(session_trades)
