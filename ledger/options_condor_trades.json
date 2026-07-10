@@ -1,5 +1,21 @@
 {
   "book": "options_condor",
-  "history": [],
-  "last_run": "2026-07-10 14:25"
+  "history": [
+    {
+      "date": "2026-07-10",
+      "symbol": "QQQ 2026-07-10 705/740",
+      "side": "short",
+      "units": 100,
+      "entry_time": "2026-07-09 14:42",
+      "exit_time": "2026-07-10 15:45",
+      "intended_entry": 0.22,
+      "intended_exit": 0.04,
+      "entry_price": 0.19,
+      "exit_price": 0.02,
+      "pnl": 17.0,
+      "slippage": 1.0,
+      "reason": "expiry_close"
+    }
+  ],
+  "last_run": "2026-07-10 15:45"
 }
