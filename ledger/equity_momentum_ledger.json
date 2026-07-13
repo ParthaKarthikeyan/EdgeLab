@@ -3,7 +3,7 @@
   "rules_version": 1,
   "deployment_date": "2026-07-04",
   "bankroll": 10000.0,
-  "cash": -2.2737367544323206e-13,
+  "cash": 4050.9038367548,
   "positions": {
     "MU": {
       "units": 2.0265,
@@ -16,20 +16,6 @@
       "units": 3.6166,
       "entry": 552.94,
       "intended_entry": 553.0,
-      "side": 1,
-      "entry_time": "2026-07-06"
-    },
-    "UNH": {
-      "units": 4.7927,
-      "entry": 417.37,
-      "intended_entry": 417.3,
-      "side": 1,
-      "entry_time": "2026-07-06"
-    },
-    "TXN": {
-      "units": 6.596,
-      "entry": 303.35,
-      "intended_entry": 303.215,
       "side": 1,
       "entry_time": "2026-07-06"
     },
@@ -139,14 +125,14 @@
     {
       "date": "2026-07-13",
       "book_start": 9881.28,
-      "book_end": 9881.28,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "trades": 0,
-      "open_positions": 5,
-      "stopped": null
+      "book_end": 9604.3,
+      "pnl": -276.98,
+      "pnl_pct": -2.8,
+      "trades": 2,
+      "open_positions": 3,
+      "stopped": "loss_stop"
     }
   ],
-  "last_run": "2026-07-13 00:04",
-  "last_rebalance": "2026-07-06"
+  "last_run": "2026-07-13 14:54",
+  "last_rebalance": "2026-07-13"
 }

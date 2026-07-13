@@ -1,5 +1,36 @@
 {
   "book": "equity_momentum",
-  "history": [],
-  "last_run": "2026-07-13 00:04"
+  "history": [
+    {
+      "date": "2026-07-13",
+      "symbol": "TXN",
+      "side": "long",
+      "units": 6.596,
+      "entry_time": "2026-07-06",
+      "exit_time": "2026-07-13 14:54",
+      "intended_entry": 303.215,
+      "intended_exit": 302.99,
+      "entry_price": 303.35,
+      "exit_price": 302.7,
+      "pnl": -4.29,
+      "slippage": 2.8,
+      "reason": "rotate"
+    },
+    {
+      "date": "2026-07-13",
+      "symbol": "UNH",
+      "side": "long",
+      "units": 4.7927,
+      "entry_time": "2026-07-06",
+      "exit_time": "2026-07-13 14:54",
+      "intended_entry": 417.3,
+      "intended_exit": 428.7401,
+      "entry_price": 417.37,
+      "exit_price": 428.6299,
+      "pnl": 53.97,
+      "slippage": 0.86,
+      "reason": "rotate"
+    }
+  ],
+  "last_run": "2026-07-13 14:54"
 }
