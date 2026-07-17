@@ -135,13 +135,13 @@
     {
       "date": "2026-07-17",
       "book_start": 9994.0,
-      "book_end": 10088.0,
-      "pnl": 94.0,
-      "pnl_pct": 0.94,
+      "book_end": 10099.0,
+      "pnl": 105.0,
+      "pnl_pct": 1.05,
       "trades": 0,
       "open_positions": 1,
       "stopped": null
     }
   ],
-  "last_run": "2026-07-17 12:30"
+  "last_run": "2026-07-17 13:39"
 }
