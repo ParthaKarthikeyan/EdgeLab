@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-21 19:45",
+  "generated": "2026-07-21 19:58",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -164,8 +164,8 @@
       "rules_version": 1,
       "deployment_date": "2026-07-08",
       "sessions": 14,
-      "pnl": 101.0,
-      "rolling_avg": 7.21,
+      "pnl": 105.0,
+      "rolling_avg": 7.5,
       "rolling_window_filled": 14,
       "stage": "paper",
       "gate_a": {
@@ -191,7 +191,7 @@
           {
             "name": "positive_on_fills",
             "passed": true,
-            "detail": "total P&L +101.00 (filled prices)"
+            "detail": "total P&L +105.00 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
