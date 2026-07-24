@@ -135,7 +135,22 @@
       "pnl": 21.0,
       "slippage": 0.0,
       "reason": "expiry_close"
+    },
+    {
+      "date": "2026-07-24",
+      "symbol": "QQQ 2026-07-23 689/723",
+      "side": "short",
+      "units": 100,
+      "entry_time": "2026-07-22 14:25",
+      "exit_time": "2026-07-23 16:00",
+      "intended_entry": 0.26,
+      "intended_exit": 0.0,
+      "entry_price": 0.3,
+      "exit_price": 0.0,
+      "pnl": 30.0,
+      "slippage": -4.0,
+      "reason": "expired"
     }
   ],
-  "last_run": "2026-07-23 16:44"
+  "last_run": "2026-07-24 10:00"
 }
