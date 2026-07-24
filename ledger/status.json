@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-23 21:17",
+  "generated": "2026-07-24 00:08",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -10,10 +10,10 @@
       "dd_budget_pct": 20.0,
       "rules_version": 2,
       "deployment_date": "2026-07-04",
-      "sessions": 20,
+      "sessions": 21,
       "pnl": 0.0,
       "rolling_avg": 0.0,
-      "rolling_window_filled": 20,
+      "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -33,7 +33,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "20 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "21 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -61,7 +61,7 @@
       "dd_budget_pct": 15.0,
       "rules_version": 1,
       "deployment_date": "2026-07-03",
-      "sessions": 21,
+      "sessions": 22,
       "pnl": 0.0,
       "rolling_avg": 0.0,
       "rolling_window_filled": 21,
@@ -84,7 +84,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "21 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "22 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -112,10 +112,10 @@
       "dd_budget_pct": 25.0,
       "rules_version": 1,
       "deployment_date": "2026-07-04",
-      "sessions": 20,
+      "sessions": 21,
       "pnl": -333.6,
-      "rolling_avg": -16.68,
-      "rolling_window_filled": 20,
+      "rolling_avg": -15.89,
+      "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -135,7 +135,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "20 sessions, 2 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "21 sessions, 2 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
