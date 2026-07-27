@@ -30,7 +30,37 @@
       "pnl": 53.97,
       "slippage": 0.86,
       "reason": "rotate"
+    },
+    {
+      "date": "2026-07-27",
+      "symbol": "INTC",
+      "side": "long",
+      "units": 18.81,
+      "entry_time": "2026-07-06",
+      "exit_time": "2026-07-27 15:49",
+      "intended_entry": 122.7,
+      "intended_exit": 88.7261,
+      "entry_price": 119.5031,
+      "exit_price": 88.6385,
+      "pnl": -580.56,
+      "slippage": -58.49,
+      "reason": "rotate"
+    },
+    {
+      "date": "2026-07-27",
+      "symbol": "UNH",
+      "side": "long",
+      "units": 4.4057,
+      "entry_time": "2026-07-20",
+      "exit_time": "2026-07-27 15:49",
+      "intended_entry": 421.995,
+      "intended_exit": 418.16,
+      "entry_price": 422.19,
+      "exit_price": 418.0,
+      "pnl": -18.46,
+      "slippage": 1.56,
+      "reason": "rotate"
     }
   ],
-  "last_run": "2026-07-27 08:40"
+  "last_run": "2026-07-27 15:49"
 }
