@@ -3,7 +3,7 @@
   "rules_version": 1,
   "deployment_date": "2026-07-08",
   "bankroll": 10000.0,
-  "cash": 10345.0,
+  "cash": 10409.0,
   "positions": {
     "QQQ 2026-07-28 662/695": {
       "legs": [
@@ -35,6 +35,37 @@
       "intended_credit": 0.29,
       "expiry": "2026-07-28",
       "entry_time": "2026-07-27 14:25"
+    },
+    "QQQ 2026-07-29 659/691": {
+      "legs": [
+        {
+          "symbol": "QQQ260729P00659000",
+          "side": "short"
+        },
+        {
+          "symbol": "QQQ260729P00654000",
+          "side": "long"
+        },
+        {
+          "symbol": "QQQ260729C00691000",
+          "side": "short"
+        },
+        {
+          "symbol": "QQQ260729C00696000",
+          "side": "long"
+        }
+      ],
+      "strikes": {
+        "sp": 659.0,
+        "lp": 654.0,
+        "sc": 691.0,
+        "lc": 696.0
+      },
+      "contracts": 1,
+      "credit": 0.64,
+      "intended_credit": 0.59,
+      "expiry": "2026-07-29",
+      "entry_time": "2026-07-28 14:25"
     }
   },
   "day_anchor": {
@@ -249,9 +280,9 @@
       "pnl": 42.0,
       "pnl_pct": 0.41,
       "trades": 0,
-      "open_positions": 1,
+      "open_positions": 2,
       "stopped": null
     }
   ],
-  "last_run": "2026-07-28 13:57"
+  "last_run": "2026-07-28 14:25"
 }
