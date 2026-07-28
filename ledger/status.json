@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-28 12:05",
+  "generated": "2026-07-28 14:00",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -163,10 +163,10 @@
       "dd_budget_pct": 20.0,
       "rules_version": 1,
       "deployment_date": "2026-07-08",
-      "sessions": 20,
+      "sessions": 21,
       "pnl": 167.0,
-      "rolling_avg": 8.35,
-      "rolling_window_filled": 20,
+      "rolling_avg": 7.95,
+      "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
         "passed": true,
@@ -186,7 +186,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "20 sessions, 12 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "21 sessions, 12 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -196,7 +196,7 @@
           {
             "name": "drawdown_in_budget",
             "passed": true,
-            "detail": "max DD 0.0% vs budget 20%"
+            "detail": "max DD 0.2% vs budget 20%"
           },
           {
             "name": "reconciliation",
