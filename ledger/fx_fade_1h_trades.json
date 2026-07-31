@@ -1,5 +1,21 @@
 {
   "book": "fx_fade_1h",
-  "history": [],
-  "last_run": "2026-07-31 15:26"
+  "history": [
+    {
+      "date": "2026-07-31",
+      "symbol": "AUD/USD",
+      "side": "long",
+      "units": 41744,
+      "entry_time": "2026-07-31 12:00:00+00:00",
+      "exit_time": "2026-07-31 17:48",
+      "intended_entry": 0.7012,
+      "intended_exit": 0.7026,
+      "entry_price": 0.7014,
+      "exit_price": 0.7036,
+      "pnl": 88.91,
+      "slippage": -32.98,
+      "reason": "mean"
+    }
+  ],
+  "last_run": "2026-07-31 17:48"
 }

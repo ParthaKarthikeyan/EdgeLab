@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-31 15:26",
+  "generated": "2026-07-31 17:48",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -62,10 +62,10 @@
       "rules_version": 1,
       "deployment_date": "2026-07-03",
       "sessions": 29,
-      "pnl": 35.48,
-      "rolling_avg": 1.69,
+      "pnl": 88.91,
+      "rolling_avg": 4.23,
       "rolling_window_filled": 21,
-      "stage": "promoted",
+      "stage": "paper",
       "gate_a": {
         "passed": true,
         "generated": "2026-07-03 15:04",
@@ -79,17 +79,17 @@
       },
       "gate_b": {
         "gate": "B",
-        "passed": true,
+        "passed": false,
         "checks": [
           {
             "name": "evidence",
             "passed": true,
-            "detail": "29 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "29 sessions, 1 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
             "passed": true,
-            "detail": "total P&L +35.48 (filled prices)"
+            "detail": "total P&L +88.91 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
@@ -98,32 +98,12 @@
           },
           {
             "name": "reconciliation",
-            "passed": true,
-            "detail": "slippage $0.00 vs gross $0.00 (0.0%, cap 10%)"
+            "passed": false,
+            "detail": "slippage $32.98 vs gross $88.91 (37.1%, cap 10%)"
           }
         ]
       },
-      "gate_c": {
-        "gate": "C",
-        "passed": true,
-        "checks": [
-          {
-            "name": "sessions",
-            "passed": true,
-            "detail": "29/21 forward sessions"
-          },
-          {
-            "name": "rolling_avg_positive",
-            "passed": true,
-            "detail": "rolling-21 average +1.69 $/day"
-          },
-          {
-            "name": "drawdown_in_budget",
-            "passed": true,
-            "detail": "max DD 0.0% vs budget 15%"
-          }
-        ]
-      }
+      "gate_c": null
     },
     "equity_momentum": {
       "label": "US equity momentum (top 5)",
@@ -133,8 +113,8 @@
       "rules_version": 1,
       "deployment_date": "2026-07-04",
       "sessions": 28,
-      "pnl": -1466.56,
-      "rolling_avg": -64.18,
+      "pnl": -1358.62,
+      "rolling_avg": -59.04,
       "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
@@ -160,7 +140,7 @@
           {
             "name": "positive_on_fills",
             "passed": false,
-            "detail": "total P&L -1,466.56 (filled prices)"
+            "detail": "total P&L -1,358.62 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",

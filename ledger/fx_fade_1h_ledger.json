@@ -3,16 +3,8 @@
   "rules_version": 1,
   "deployment_date": "2026-07-03",
   "bankroll": 10000.0,
-  "cash": 10000.0,
-  "positions": {
-    "AUD/USD": {
-      "units": 41744,
-      "entry": 0.70143,
-      "intended_entry": 0.70122,
-      "side": 1,
-      "entry_time": "2026-07-31 12:00:00+00:00"
-    }
-  },
+  "cash": 10088.914719999999,
+  "positions": {},
   "day_anchor": {
     "date": "2026-07-31",
     "equity": 10000.0
@@ -301,13 +293,13 @@
     {
       "date": "2026-07-31",
       "book_start": 10000.0,
-      "book_end": 10035.48,
-      "pnl": 35.48,
-      "pnl_pct": 0.35,
-      "trades": 0,
-      "open_positions": 1,
+      "book_end": 10088.91,
+      "pnl": 88.91,
+      "pnl_pct": 0.89,
+      "trades": 1,
+      "open_positions": 0,
       "stopped": null
     }
   ],
-  "last_run": "2026-07-31 15:26"
+  "last_run": "2026-07-31 17:48"
 }
