@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-31 14:00",
+  "generated": "2026-07-31 15:26",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -62,10 +62,10 @@
       "rules_version": 1,
       "deployment_date": "2026-07-03",
       "sessions": 29,
-      "pnl": -8.77,
-      "rolling_avg": -0.42,
+      "pnl": 35.48,
+      "rolling_avg": 1.69,
       "rolling_window_filled": 21,
-      "stage": "paper",
+      "stage": "promoted",
       "gate_a": {
         "passed": true,
         "generated": "2026-07-03 15:04",
@@ -79,7 +79,7 @@
       },
       "gate_b": {
         "gate": "B",
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "name": "evidence",
@@ -88,13 +88,13 @@
           },
           {
             "name": "positive_on_fills",
-            "passed": false,
-            "detail": "total P&L -8.77 (filled prices)"
+            "passed": true,
+            "detail": "total P&L +35.48 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
             "passed": true,
-            "detail": "max DD 0.1% vs budget 15%"
+            "detail": "max DD 0.0% vs budget 15%"
           },
           {
             "name": "reconciliation",
@@ -103,7 +103,27 @@
           }
         ]
       },
-      "gate_c": null
+      "gate_c": {
+        "gate": "C",
+        "passed": true,
+        "checks": [
+          {
+            "name": "sessions",
+            "passed": true,
+            "detail": "29/21 forward sessions"
+          },
+          {
+            "name": "rolling_avg_positive",
+            "passed": true,
+            "detail": "rolling-21 average +1.69 $/day"
+          },
+          {
+            "name": "drawdown_in_budget",
+            "passed": true,
+            "detail": "max DD 0.0% vs budget 15%"
+          }
+        ]
+      }
     },
     "equity_momentum": {
       "label": "US equity momentum (top 5)",
@@ -113,8 +133,8 @@
       "rules_version": 1,
       "deployment_date": "2026-07-04",
       "sessions": 28,
-      "pnl": -1354.86,
-      "rolling_avg": -58.86,
+      "pnl": -1466.56,
+      "rolling_avg": -64.18,
       "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
@@ -140,7 +160,7 @@
           {
             "name": "positive_on_fills",
             "passed": false,
-            "detail": "total P&L -1,354.86 (filled prices)"
+            "detail": "total P&L -1,466.56 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
