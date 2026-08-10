@@ -6,7 +6,7 @@
   "cash": 0.0,
   "positions": {
     "MU": {
-      "units": 2.1819,
+      "units": 1.1819,
       "entry": 972.6989,
       "intended_entry": 986.93,
       "side": 1,
@@ -20,7 +20,7 @@
       "entry_time": "2026-07-06"
     },
     "CSCO": {
-      "units": 15.8145,
+      "units": 14.6064,
       "entry": 112.55,
       "intended_entry": 112.635,
       "side": 1,
@@ -39,6 +39,13 @@
       "intended_entry": 14.605,
       "side": 1,
       "entry_time": "2026-08-03"
+    },
+    "LLY": {
+      "units": 0.8436,
+      "entry": 1206.0,
+      "intended_entry": 1202.9351,
+      "side": 1,
+      "entry_time": "2026-08-10"
     }
   },
   "day_anchor": {
@@ -419,14 +426,14 @@
     {
       "date": "2026-08-10",
       "book_start": 9074.92,
-      "book_end": 9074.92,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "book_end": 9055.61,
+      "pnl": -19.31,
+      "pnl_pct": -0.21,
       "trades": 0,
-      "open_positions": 5,
+      "open_positions": 6,
       "stopped": null
     }
   ],
-  "last_run": "2026-08-10 02:27",
-  "last_rebalance": "2026-08-03"
+  "last_run": "2026-08-10 13:36",
+  "last_rebalance": "2026-08-10"
 }
