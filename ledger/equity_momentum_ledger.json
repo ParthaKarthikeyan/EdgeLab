@@ -426,14 +426,14 @@
     {
       "date": "2026-08-10",
       "book_start": 9074.92,
-      "book_end": 9051.7,
-      "pnl": -23.22,
-      "pnl_pct": -0.26,
+      "book_end": 9076.61,
+      "pnl": 1.69,
+      "pnl_pct": 0.02,
       "trades": 0,
       "open_positions": 6,
       "stopped": null
     }
   ],
-  "last_run": "2026-08-10 15:10",
+  "last_run": "2026-08-10 17:02",
   "last_rebalance": "2026-08-10"
 }
