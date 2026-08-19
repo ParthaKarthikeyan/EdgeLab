@@ -49,8 +49,8 @@
     }
   },
   "day_anchor": {
-    "date": "2026-08-18",
-    "equity": 9169.94
+    "date": "2026-08-19",
+    "equity": 9037.99
   },
   "history": [
     {
@@ -512,8 +512,18 @@
       "trades": 0,
       "open_positions": 6,
       "stopped": null
+    },
+    {
+      "date": "2026-08-19",
+      "book_start": 9037.99,
+      "book_end": 9037.99,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "trades": 0,
+      "open_positions": 6,
+      "stopped": null
     }
   ],
-  "last_run": "2026-08-18 20:33",
+  "last_run": "2026-08-19 01:47",
   "last_rebalance": "2026-08-10"
 }
