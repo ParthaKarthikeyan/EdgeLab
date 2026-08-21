@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-21 18:25",
+  "generated": "2026-08-21 18:50",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -10,7 +10,7 @@
       "dd_budget_pct": 20.0,
       "rules_version": 2,
       "deployment_date": "2026-07-04",
-      "sessions": 48,
+      "sessions": 49,
       "pnl": 0.0,
       "rolling_avg": 0.0,
       "rolling_window_filled": 21,
@@ -33,7 +33,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "48 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "49 sessions, 0 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -113,8 +113,8 @@
       "rules_version": 1,
       "deployment_date": "2026-07-04",
       "sessions": 49,
-      "pnl": -1238.35,
-      "rolling_avg": 10.38,
+      "pnl": -1228.75,
+      "rolling_avg": 10.84,
       "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
@@ -140,7 +140,7 @@
           {
             "name": "positive_on_fills",
             "passed": false,
-            "detail": "total P&L -1,238.35 (filled prices)"
+            "detail": "total P&L -1,228.75 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
