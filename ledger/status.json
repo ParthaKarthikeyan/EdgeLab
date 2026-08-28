@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-28 05:18",
+  "generated": "2026-08-28 14:00",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -163,9 +163,9 @@
       "dd_budget_pct": 20.0,
       "rules_version": 1,
       "deployment_date": "2026-07-08",
-      "sessions": 51,
+      "sessions": 52,
       "pnl": -264.0,
-      "rolling_avg": -0.67,
+      "rolling_avg": -0.48,
       "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
@@ -186,7 +186,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "51 sessions, 24 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "52 sessions, 24 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
