@@ -6,7 +6,7 @@
   "cash": 10088.914719999999,
   "positions": {},
   "day_anchor": {
-    "date": "2026-08-31",
+    "date": "2026-09-01",
     "equity": 10088.91
   },
   "history": [
@@ -609,7 +609,17 @@
       "trades": 0,
       "open_positions": 0,
       "stopped": null
+    },
+    {
+      "date": "2026-09-01",
+      "book_start": 10088.91,
+      "book_end": 10088.91,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "trades": 0,
+      "open_positions": 0,
+      "stopped": null
     }
   ],
-  "last_run": "2026-08-31 05:21"
+  "last_run": "2026-09-01 04:56"
 }
