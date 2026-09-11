@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-11 18:24",
+  "generated": "2026-09-11 19:45",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -164,8 +164,8 @@
       "rules_version": 1,
       "deployment_date": "2026-07-08",
       "sessions": 66,
-      "pnl": -272.0,
-      "rolling_avg": -1.14,
+      "pnl": -267.0,
+      "rolling_avg": -0.9,
       "rolling_window_filled": 21,
       "stage": "paper",
       "gate_a": {
@@ -186,12 +186,12 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "66 sessions, 25 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "66 sessions, 26 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
             "passed": false,
-            "detail": "total P&L -272.00 (filled prices)"
+            "detail": "total P&L -267.00 (filled prices)"
           },
           {
             "name": "drawdown_in_budget",
@@ -201,7 +201,7 @@
           {
             "name": "reconciliation",
             "passed": true,
-            "detail": "slippage $104.00 vs gross $1,082.00 (9.6%, cap 10%)"
+            "detail": "slippage $108.00 vs gross $1,105.00 (9.8%, cap 10%)"
           }
         ]
       },
