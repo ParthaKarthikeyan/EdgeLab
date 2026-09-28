@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-28 14:00",
+  "generated": "2026-09-28 19:45",
   "bankroll": 10000.0,
   "rolling_window": 21,
   "books": {
@@ -186,7 +186,7 @@
           {
             "name": "evidence",
             "passed": true,
-            "detail": "83 sessions, 28 closed trades (need 10 sessions, or 7+ with 20+ trades)"
+            "detail": "83 sessions, 29 closed trades (need 10 sessions, or 7+ with 20+ trades)"
           },
           {
             "name": "positive_on_fills",
@@ -201,7 +201,7 @@
           {
             "name": "reconciliation",
             "passed": false,
-            "detail": "slippage $120.00 vs gross $1,141.00 (10.5%, cap 10%)"
+            "detail": "slippage $118.00 vs gross $1,150.00 (10.3%, cap 10%)"
           }
         ]
       },
