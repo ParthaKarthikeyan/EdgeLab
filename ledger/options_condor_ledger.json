@@ -865,13 +865,13 @@
     {
       "date": "2026-09-28",
       "book_start": 10158.0,
-      "book_end": 10158.0,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "book_end": 10159.0,
+      "pnl": 1.0,
+      "pnl_pct": 0.01,
       "trades": 1,
       "open_positions": 1,
       "stopped": null
     }
   ],
-  "last_run": "2026-09-28 15:45"
+  "last_run": "2026-09-28 16:30"
 }
