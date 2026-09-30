@@ -916,13 +916,13 @@
     {
       "date": "2026-09-30",
       "book_start": 10173.0,
-      "book_end": 10172.0,
-      "pnl": -1.0,
-      "pnl_pct": -0.01,
+      "book_end": 10170.0,
+      "pnl": -3.0,
+      "pnl_pct": -0.03,
       "trades": 0,
       "open_positions": 2,
       "stopped": null
     }
   ],
-  "last_run": "2026-09-30 14:25"
+  "last_run": "2026-09-30 15:06"
 }
