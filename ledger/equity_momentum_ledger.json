@@ -1226,14 +1226,14 @@
     {
       "date": "2026-10-29",
       "book_start": 8696.92,
-      "book_end": 8862.43,
-      "pnl": 165.51,
-      "pnl_pct": 1.9,
+      "book_end": 8924.66,
+      "pnl": 227.74,
+      "pnl_pct": 2.62,
       "trades": 0,
       "open_positions": 6,
       "stopped": null
     }
   ],
-  "last_run": "2026-10-29 06:57",
+  "last_run": "2026-10-29 14:07",
   "last_rebalance": "2026-08-10"
 }
