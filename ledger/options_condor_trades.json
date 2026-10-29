@@ -570,7 +570,22 @@
       "pnl": 72.0,
       "slippage": -4.0,
       "reason": "expired"
+    },
+    {
+      "date": "2026-10-29",
+      "symbol": "QQQ 2026-10-28 704/738",
+      "side": "short",
+      "units": 100,
+      "entry_time": "2026-10-27 15:22",
+      "exit_time": "2026-10-28 16:00",
+      "intended_entry": 0.17,
+      "intended_exit": 0.0,
+      "entry_price": 0.21,
+      "exit_price": 0.0,
+      "pnl": 21.0,
+      "slippage": -4.0,
+      "reason": "expired"
     }
   ],
-  "last_run": "2026-10-28 17:15"
+  "last_run": "2026-10-29 15:31"
 }
